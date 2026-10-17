@@ -128,7 +128,7 @@ flowchart TD
 
 - **Objective:** explain the transition into error state.
 - **Concepts:** FaultRule, DefaultFaultRule, non-disclosing messages.
-- **Suggested narrative:** faults leave the normal pipeline; known JWT faults receive 401 and the fallback covers everything else. Put rules where the error can occur.
+- **Suggested narrative:** faults leave the normal pipeline; `JWT.failed` routes all JWT-policy failures to 401 and the fallback covers everything else. ProxyEndpoint and TargetEndpoint have separate handlers because rules belong where errors can occur.
 - **Repository example:** advanced ProxyEndpoint FaultRules.
 - **Takeaway:** error responses deserve the same design and testing rigor as success responses.
 

@@ -128,7 +128,7 @@ flowchart TD
 
 - **Objetivo:** explicar a transição para o estado de erro.
 - **Conceitos:** FaultRule, DefaultFaultRule e mensagens não reveladoras.
-- **Fala sugerida:** falhas encerram o pipeline normal; JWT conhecido recebe 401 e o fallback cobre o restante. A regra deve estar no endpoint onde o erro ocorre.
+- **Fala sugerida:** falhas encerram o pipeline normal; `JWT.failed` direciona todas as falhas das policies JWT para 401 e o fallback cobre o restante. ProxyEndpoint e TargetEndpoint têm handlers próprios porque a regra deve estar no endpoint onde o erro ocorre.
 - **Exemplo:** FaultRules do ProxyEndpoint avançado.
 - **Mensagem principal:** respostas de erro precisam ser desenhadas e testadas como respostas de sucesso.
 

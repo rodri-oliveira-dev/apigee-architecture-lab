@@ -141,6 +141,7 @@ def validate_bundle(bundle: Path, shared_flow_names: set[str]) -> list[Finding]:
     if bundle.name == "apiproxy":
         target_dir = bundle / "targets"
         targets: set[str] = set()
+        valid_targets: list[tuple[Path, ET.Element]] = []
         if not target_dir.is_dir():
             findings.append(Finding("ROUTE001", target_dir, "targets directory is required by this lab"))
         else:
@@ -148,6 +149,15 @@ def validate_bundle(bundle: Path, shared_flow_names: set[str]) -> list[Finding]:
                 root = parsed.get(path)
                 if root is not None and root.tag == "TargetEndpoint" and root.get("name"):
                     targets.add(root.get("name", ""))
+                    valid_targets.append((path, root))
+        for target_path, target_root in valid_targets:
+            for name_node in target_root.findall(".//Step/Name"):
+                reference = (name_node.text or "").strip()
+                if reference and reference not in policy_names:
+                    findings.append(Finding(
+                        "STEP001", target_path,
+                        f"Step references missing policy '{reference}'",
+                    ))
         for proxy_path, proxy_root in valid_endpoints:
             route_rules = proxy_root.findall("./RouteRule")
             if not route_rules:

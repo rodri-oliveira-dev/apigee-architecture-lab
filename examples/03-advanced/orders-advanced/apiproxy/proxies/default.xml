@@ -20,7 +20,7 @@
   <FaultRules>
     <FaultRule name="jwt-fault">
       <Step><Name>assign-auth-fault</Name></Step>
-      <Condition>(fault.name = "InvalidToken") or (fault.name = "TokenExpired") or (fault.name = "TokenNotYetValid") or (fault.name = "JwtAudienceMismatch") or (fault.name = "JwtIssuerMismatch") or (fault.name = "InvalidPublicKey") or (fault.name = "KeyIdMissing") or (fault.name = "NoMatchingPublicKey")</Condition>
+      <Condition>JWT.failed = true</Condition>
     </FaultRule>
   </FaultRules>
   <DefaultFaultRule name="default-fault">

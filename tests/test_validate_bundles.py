@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+import xml.etree.ElementTree as ET
 
 from scripts.validate_bundles import validate_repository
 
@@ -62,6 +63,18 @@ class ValidatorTests(unittest.TestCase):
             (bundle / "targets" / "default.xml").write_text(TARGET.replace('name="default"', 'name="other"'), encoding="utf-8")
             self.assertIn("ROUTE003", self.codes(root))
 
+    def test_reports_missing_policy_referenced_by_target_step(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            bundle = self.make_bundle(root)
+            target_with_step = TARGET.replace(
+                '<Request/>',
+                '<Request><Step><Name>missing-target-policy</Name></Step></Request>',
+                1,
+            )
+            (bundle / "targets" / "default.xml").write_text(target_with_step, encoding="utf-8")
+            self.assertIn("STEP001", self.codes(root))
+
     def test_reports_policy_filename_mismatch(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -83,6 +96,24 @@ class ValidatorTests(unittest.TestCase):
             root = Path(directory)
             self.make_bundle(root)
             self.assertIn("DOC001", [item.code for item in validate_repository(root)])
+
+
+class AdvancedBundleContractTests(unittest.TestCase):
+    root = Path(__file__).resolve().parents[1]
+
+    def test_all_jwt_policy_failures_use_authentication_fault(self):
+        proxy = ET.parse(
+            self.root / "examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml"
+        ).getroot()
+        condition = proxy.findtext("./FaultRules/FaultRule[@name='jwt-fault']/Condition")
+        self.assertEqual("JWT.failed = true", condition)
+
+    def test_target_errors_use_safe_default_fault(self):
+        target = ET.parse(
+            self.root / "examples/03-advanced/orders-advanced/apiproxy/targets/default.xml"
+        ).getroot()
+        policy = target.findtext("./DefaultFaultRule/Step/Name")
+        self.assertEqual("assign-default-fault", policy)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@
 
 **Problema:** validar tokens assimétricos, centralizar comportamento reutilizável e devolver falhas seguras e previsíveis. O módulo contém dois artefatos independentes: `orders-security-shared/sharedflowbundle/` e o consumidor `orders-advanced/apiproxy/`.
 
-**Arquivos e sequência:** `verify-jwt.xml` verifica RS256, emissor, audience e JWKS obtido de `private.orders.jwks`; `call-shared-security.xml` invoca `orders-security-shared`; o Shared Flow executa `assign-security-context.xml` para propagar o subject validado. `assign-auth-fault.xml` trata falhas JWT conhecidas e `assign-default-fault.xml` evita expor detalhes nas demais falhas.
+**Arquivos e sequência:** `verify-jwt.xml` verifica RS256, emissor, audience e JWKS obtido de `private.orders.jwks`; `call-shared-security.xml` invoca `orders-security-shared`; o Shared Flow executa `assign-security-context.xml` para propagar o subject validado. `assign-auth-fault.xml` trata qualquer falha de uma policy JWT, identificada pela variável documentada `JWT.failed`; `assign-default-fault.xml` evita expor detalhes nas demais falhas, inclusive erros de conexão tratados pelo `DefaultFaultRule` do TargetEndpoint.
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart TD
     E -->|sim| X[Sair do pipeline normal]
     X --> J{Falha JWT conhecida?}
     J -->|sim| A[FaultRule → resposta 401]
-    J -->|não| D[DefaultFaultRule → resposta 500]
+    J -->|não| D[DefaultFaultRule do endpoint da falha → resposta 500]
     A --> C[Cliente]
     D --> C
 ```
@@ -35,7 +35,7 @@ flowchart TD
 
 **Problem:** verify asymmetric tokens, centralize reusable behavior, and return safe, predictable failures. This module has two independent artifacts: a shared-flow bundle and its consuming API proxy.
 
-The proxy executes `VerifyJWT → FlowCallout`; the shared flow adds the verified subject to the target request. VerifyJWT uses its default `Authorization: Bearer ...` source behavior. A JWT FaultRule returns a controlled 401, while the DefaultFaultRule provides a non-disclosing fallback. Runtime requires trusted JWKS in `private.orders.jwks`, secure key lifecycle management, and deployment of the shared flow to the same environment before the proxy. Shared flows cannot receive traffic directly.
+The proxy executes `VerifyJWT → FlowCallout`; the shared flow adds the verified subject to the target request. VerifyJWT uses its default `Authorization: Bearer ...` source behavior. The documented `JWT.failed` variable routes every JWT-policy failure to a controlled 401. Proxy and target DefaultFaultRules provide non-disclosing fallbacks, including target connection failures. Runtime requires trusted JWKS in `private.orders.jwks`, secure key lifecycle management, and deployment of the shared flow to the same environment before the proxy. Shared flows cannot receive traffic directly.
 
 The `.invalid` issuer is a fictitious contract, not an integration. Key retrieval/rotation, caching, scope authorization, logging, and masking are intentionally out of scope. Reuse only genuinely shared concerns and place FaultRules at the endpoint where errors can arise.
 
