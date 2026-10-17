@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<VerifyJWT name="verify-jwt" continueOnError="false" enabled="true">
+  <DisplayName>Verify Orders JWT</DisplayName>
+  <Algorithm>RS256</Algorithm>
+  <PublicKey>
+    <JWKS ref="private.orders.jwks"/>
+  </PublicKey>
+  <Issuer>https://identity.example.invalid/</Issuer>
+  <Audience>orders-api</Audience>
+  <RequiredClaims>sub,iss,aud,exp</RequiredClaims>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</VerifyJWT>

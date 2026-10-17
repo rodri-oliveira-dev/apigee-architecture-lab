@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TargetEndpoint name="default">
+  <Description>Fictitious target used only as a bundle-complete placeholder.</Description>
+  <PreFlow name="PreFlow"><Request/><Response/></PreFlow>
+  <Flows/>
+  <PostFlow name="PostFlow"><Request/><Response/></PostFlow>
+  <HTTPTargetConnection>
+    <URL>https://orders-backend.example.invalid/v1</URL>
+  </HTTPTargetConnection>
+  <DefaultFaultRule name="default-target-fault">
+    <Step><Name>assign-default-fault</Name></Step>
+  </DefaultFaultRule>
+</TargetEndpoint>

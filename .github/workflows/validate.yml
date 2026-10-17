@@ -1,0 +1,50 @@
+name: Validate Apigee lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Validate bundles and documentation
+        run: python scripts/validate_bundles.py
+
+      - name: Run validator unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.13.1"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+
+      - name: Install presentation dependencies
+        run: npm ci --prefix presentation
+
+      - name: Build presentation
+        env:
+          PRESENTATION_GITHUB_REF: ${{ github.head_ref || github.ref_name }}
+          PRESENTATION_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: npm run build --prefix presentation
+
+      - name: Validate presentation
+        run: npm run validate --prefix presentation

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SharedFlowBundle revision="1" name="orders-security-shared">
+  <DisplayName>Orders Security Shared Flow</DisplayName>
+  <Description>Reusable security-context enrichment for orders proxies.</Description>
+  <Policies><Policy>assign-security-context</Policy></Policies>
+  <SharedFlows><SharedFlow>default</SharedFlow></SharedFlows>
+</SharedFlowBundle>

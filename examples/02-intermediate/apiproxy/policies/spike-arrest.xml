@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SpikeArrest name="spike-arrest" continueOnError="false" enabled="true">
+  <DisplayName>Spike Arrest</DisplayName>
+  <Rate>10ps</Rate>
+  <UseEffectiveCount>true</UseEffectiveCount>
+</SpikeArrest>

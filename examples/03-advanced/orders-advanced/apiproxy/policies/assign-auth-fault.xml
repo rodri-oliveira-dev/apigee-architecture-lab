@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-auth-fault" continueOnError="false" enabled="true">
+  <DisplayName>Assign Authentication Fault</DisplayName>
+  <Set>
+    <Headers><Header name="Content-Type">application/json</Header></Headers>
+    <Payload contentType="application/json">{"error":"unauthorized","message":"A valid bearer token is required."}</Payload>
+    <StatusCode>401</StatusCode>
+    <ReasonPhrase>Unauthorized</ReasonPhrase>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

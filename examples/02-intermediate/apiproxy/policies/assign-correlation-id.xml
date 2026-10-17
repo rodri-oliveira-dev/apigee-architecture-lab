@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-correlation-id" continueOnError="false" enabled="true">
+  <DisplayName>Assign Correlation ID</DisplayName>
+  <Set>
+    <Headers>
+      <Header name="x-correlation-id">{messageid}</Header>
+    </Headers>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

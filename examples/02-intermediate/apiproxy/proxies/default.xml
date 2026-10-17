@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProxyEndpoint name="default">
+  <Description>Secured entry point with traffic controls and a conditional flow.</Description>
+  <PreFlow name="PreFlow">
+    <Request>
+      <Step><Name>verify-api-key</Name></Step>
+      <Step><Name>spike-arrest</Name></Step>
+      <Step><Name>quota</Name></Step>
+      <Step><Name>assign-correlation-id</Name></Step>
+    </Request>
+    <Response/>
+  </PreFlow>
+  <Flows>
+    <Flow name="list-orders">
+      <Description>Matches only collection reads.</Description>
+      <Request/>
+      <Response/>
+      <Condition>(proxy.pathsuffix = "/") and (request.verb = "GET")</Condition>
+    </Flow>
+  </Flows>
+  <PostFlow name="PostFlow">
+    <Request/>
+    <Response/>
+  </PostFlow>
+  <HTTPProxyConnection>
+    <BasePath>/lab/v1/orders-intermediate</BasePath>
+  </HTTPProxyConnection>
+  <RouteRule name="default-route">
+    <TargetEndpoint>default</TargetEndpoint>
+  </RouteRule>
+</ProxyEndpoint>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FlowCallout name="call-shared-security" continueOnError="false" enabled="true">
+  <DisplayName>Call Shared Security Flow</DisplayName>
+  <SharedFlowBundle>orders-security-shared</SharedFlowBundle>
+</FlowCallout>
