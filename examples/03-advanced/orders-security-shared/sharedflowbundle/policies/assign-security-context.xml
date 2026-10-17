@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-security-context" continueOnError="false" enabled="true">
+  <DisplayName>Assign Security Context</DisplayName>
+  <Set>
+    <Headers>
+      <Header name="x-authenticated-subject">{jwt.verify-jwt.decoded.claim.sub}</Header>
+    </Headers>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

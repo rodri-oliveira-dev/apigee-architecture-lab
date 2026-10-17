@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy revision="1" name="orders-basic">
+  <DisplayName>Orders Basic</DisplayName>
+  <Description>Basic orders proxy used by the educational lab.</Description>
+  <ProxyEndpoints><ProxyEndpoint>default</ProxyEndpoint></ProxyEndpoints>
+  <TargetEndpoints><TargetEndpoint>default</TargetEndpoint></TargetEndpoints>
+</APIProxy>

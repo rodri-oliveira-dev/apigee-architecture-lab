@@ -1,0 +1,29 @@
+name: Validate Apigee lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate bundles and documentation
+        run: python scripts/validate_bundles.py
+
+      - name: Run validator unit tests
+        run: python -m unittest discover -s tests -v

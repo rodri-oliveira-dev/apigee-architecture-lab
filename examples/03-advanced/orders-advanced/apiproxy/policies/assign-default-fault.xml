@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-default-fault" continueOnError="false" enabled="true">
+  <DisplayName>Assign Safe Default Fault</DisplayName>
+  <Set>
+    <Headers><Header name="Content-Type">application/json</Header></Headers>
+    <Payload contentType="application/json">{"error":"gateway_error","message":"The request could not be processed."}</Payload>
+    <StatusCode>500</StatusCode>
+    <ReasonPhrase>Gateway Error</ReasonPhrase>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>
