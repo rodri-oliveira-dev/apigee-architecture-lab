@@ -1,0 +1,71 @@
+name: Publish presentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-presentation.yml"
+      - "docs/pt-br/**"
+      - "examples/**"
+      - "presentation/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build presentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.13.1"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --prefix presentation
+
+      - name: Build static presentation
+        env:
+          PRESENTATION_GITHUB_REF: ${{ github.ref_name }}
+          PRESENTATION_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: npm run build --prefix presentation
+
+      - name: Validate static presentation
+        run: npm run validate --prefix presentation
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: presentation/dist
+
+  deploy:
+    name: Deploy presentation
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -46,6 +46,8 @@ npm run validate --prefix presentation
 
 O resultado fica em `presentation/dist/`; mantenha a pasta completa e sirva-a por HTTP. Os slides exibem o caminho de cada exemplo e oferecem links para o código correspondente no GitHub. Consulte o [guia específico da apresentação](presentation/README.md) para configuração de branch, porta alternativa e detalhes da geração.
 
+Após alterações chegarem à branch `main`, o workflow `Publish presentation` valida e publica essa mesma distribuição no [GitHub Pages](https://rodri-oliveira-dev.github.io/apigee-architecture-lab/). Também é possível iniciá-lo manualmente pela aba Actions. Pull Requests executam apenas validação e nunca publicam conteúdo.
+
 ## Validação local
 
 Requer Python 3.11 ou mais recente; não há dependências externas.

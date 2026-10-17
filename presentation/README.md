@@ -34,6 +34,16 @@ npm run validate --prefix presentation
 
 O build gera `presentation/dist/`, uma pasta autocontida para servir por HTTP. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
 
+## Publicação no GitHub Pages
+
+O workflow `.github/workflows/publish-presentation.yml` publica `presentation/dist/` em:
+
+<https://rodri-oliveira-dev.github.io/apigee-architecture-lab/>
+
+O deploy ocorre após pushes na branch `main` que alterem a apresentação, os exemplos utilizados ou a documentação Mermaid de origem. Também pode ser iniciado por `workflow_dispatch` na aba Actions. Pull Requests não publicam: eles executam somente o workflow de validação.
+
+O workflow utiliza o ambiente `github-pages`, empacota apenas a distribuição estática e não armazena o conteúdo gerado em uma branch adicional.
+
 Por padrão, os links “Ver código” usam a URL do remote `origin` e a branch Git atual. Em CI ou builds de distribuição, esses valores podem ser definidos explicitamente:
 
 ```bash
