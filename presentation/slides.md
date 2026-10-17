@@ -11,6 +11,12 @@
   <span>25–30 minutos</span>
 </div>
 
+<div class="navigation-hint" aria-label="Atalhos da apresentação">
+  <span><kbd>←</kbd><kbd>→</kbd> navegar</span>
+  <span><kbd>O</kbd> visão geral</span>
+  <span><kbd>S</kbd> notas</span>
+</div>
+
 Notas:
 Abra alinhando o escopo: a sessão mostra como decisões arquiteturais aparecem em bundles XML reais. Não é uma demonstração de provisionamento nem um guia de produção. Antecipe a progressão básico → intermediário → avançado e indique que todo exemplo está no repositório.
 
