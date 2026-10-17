@@ -33,6 +33,7 @@ const indexPath = resolve(outputRoot, "index.html");
 const slidesPath = resolve(outputRoot, "slides.md");
 const index = read(indexPath);
 const slides = read(slidesPath);
+const theme = read(resolve(outputRoot, "assets", "styles", "theme.css"));
 checkLocalReferences(index, outputRoot, "index.html");
 checkLocalReferences(slides, outputRoot, "slides.md");
 
@@ -41,6 +42,8 @@ if (slideCount !== 12) failures.push(`quantidade de slides esperada: 12; encontr
 if ((slides.match(/^Notas?:$/gm) ?? []).length !== slideCount) failures.push("cada slide deve possuir notas do apresentador");
 if (/\{\{(?:xml|mermaid|github):/.test(slides)) failures.push("diretivas de geração não resolvidas");
 if (!slides.includes('class="language-xml"')) failures.push("nenhum trecho XML com destaque de sintaxe");
+if (!theme.includes(".reveal-viewport")) failures.push("tema não sobrescreve o viewport padrão do Reveal.js");
+if (!index.includes('slideNumber: "c/t"')) failures.push("numeração de slides não configurada");
 
 for (const name of ["architecture.svg", "execution-flow.svg", "advanced-flow.svg"]) {
   const path = resolve(outputRoot, "assets", "diagrams", name);
