@@ -40,6 +40,7 @@ npm start --prefix presentation
 Open <http://127.0.0.1:8000>. Navigate with the arrow keys, press `O` for the overview, and `S` for speaker notes. Build and validate the static distribution with:
 
 ```bash
+npm run validate:mermaid --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```

@@ -40,6 +40,7 @@ npm start --prefix presentation
 Abra <http://127.0.0.1:8000>. Navegue com as setas, pressione `O` para a visão geral e `S` para as notas do apresentador. Gere e valide a distribuição estática com:
 
 ```bash
+npm run validate:mermaid --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```

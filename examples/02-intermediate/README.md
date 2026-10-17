@@ -31,7 +31,7 @@ sequenceDiagram
         A->>A: SpikeArrest → Quota → AssignMessage
         A-->>C: encaminha/responde
     else ausente, inválida ou não autorizada
-        A-->>C: falha da policy; pipeline normal é interrompido
+        A-->>C: falha da policy, pipeline normal é interrompido
     end
 ```
 

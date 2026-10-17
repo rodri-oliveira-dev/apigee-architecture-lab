@@ -25,11 +25,12 @@ A apresentação possui uma validação complementar e reproduzível:
 
 ```bash
 npm ci --prefix presentation
+npm run validate:mermaid --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-Ela verifica a geração dos diagramas, a quantidade de slides e notas, os trechos XML, as referências locais e a integridade dos recursos estáticos empacotados.
+Ela verifica todos os blocos Mermaid dos arquivos Markdown, a geração dos diagramas usados nos slides, a quantidade de slides e notas, os trechos XML, as referências locais e a integridade dos recursos estáticos empacotados. Erros Mermaid informam arquivo, linha inicial e número do bloco.
 
 ## O que não é verificado
 

@@ -40,6 +40,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefix presentation
 
+      - name: Validate Mermaid diagrams in Markdown
+        run: npm run validate:mermaid --prefix presentation
+
       - name: Build static presentation
         env:
           PRESENTATION_GITHUB_REF: ${{ github.ref_name }}

@@ -17,11 +17,12 @@ The presentation has an additional reproducible validation path:
 
 ```bash
 npm ci --prefix presentation
+npm run validate:mermaid --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-It checks diagram generation, slide and note counts, XML excerpts, local references, and the integrity of packaged static assets.
+It checks every Mermaid block in Markdown files, diagram generation for the slides, slide and note counts, XML excerpts, local references, and the integrity of packaged static assets. Mermaid failures report the source file, opening line, and block number.
 
 ## What is not checked
 

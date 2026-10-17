@@ -28,6 +28,7 @@ npm start --prefix presentation -- --port=8080
 ## Gerar e validar a versão estática
 
 ```bash
+npm run validate:mermaid --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
@@ -68,7 +69,7 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 - links de código são construídos a partir do remote e da referência Git configurados;
 - o resultado final é gravado somente em `dist/`.
 
-`npm run validate` confirma a quantidade de slides, notas, trechos XML, arquivos referenciados, SVGs e recursos do Reveal.js. A validação é estática e não substitui uma revisão visual em navegador.
+`npm run validate:mermaid` renderiza todos os blocos Mermaid encontrados nos arquivos Markdown e informa arquivo, linha e bloco em caso de erro. `npm run validate` confirma a quantidade de slides, notas, trechos XML, arquivos referenciados, SVGs e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
 
 ## Arquivos principais
 
