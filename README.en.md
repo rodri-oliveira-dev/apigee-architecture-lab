@@ -28,6 +28,24 @@ The `ProxyEndpoint` defines the consumer-facing interface and inbound/outbound f
 
 Follow the numeric order. Compare each module's `PreFlow` to see the policy chain grow, and use the [presentation guide](docs/en/presentation-guide.md) for a 30-minute session.
 
+## Presentation
+
+The Brazilian Portuguese technical deck uses Reveal.js, Markdown, XML highlighting, local SVG diagrams, and speaker notes. Code excerpts and diagrams are extracted from the lab sources during the build.
+
+```bash
+npm ci --prefix presentation
+npm start --prefix presentation
+```
+
+Open <http://127.0.0.1:8000>. Navigate with the arrow keys, press `O` for the overview, and `S` for speaker notes. Build and validate the static distribution with:
+
+```bash
+npm run build --prefix presentation
+npm run validate --prefix presentation
+```
+
+The output is written to `presentation/dist/`; keep the complete folder and serve it over HTTP. Slides show each example path and link to its matching GitHub source. See the [presentation-specific guide](presentation/README.md) for branch configuration, alternate ports, and generation details.
+
 ## Local validation
 
 Python 3.11+ is required; there are no third-party dependencies.

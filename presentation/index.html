@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Apresentação técnica sobre arquitetura de APIs com Google Cloud Apigee" />
+    <title>Google Cloud Apigee — arquitetura em prática</title>
+    <link rel="stylesheet" href="vendor/reveal/reveal.css" />
+    <link rel="stylesheet" href="vendor/reveal/monokai.css" />
+    <link rel="stylesheet" href="assets/styles/theme.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section
+          data-markdown="slides.md"
+          data-separator="^\r?\n---\r?\n$"
+          data-separator-notes="^Notas?:"
+          data-charset="utf-8"
+        ></section>
+      </div>
+    </div>
+
+    <script src="vendor/reveal/reveal.js"></script>
+    <script src="vendor/reveal/markdown.js"></script>
+    <script src="vendor/reveal/highlight.js"></script>
+    <script src="vendor/reveal/notes.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1280,
+        height: 720,
+        margin: 0.045,
+        hash: true,
+        controls: true,
+        controlsTutorial: false,
+        progress: true,
+        center: true,
+        transition: "fade",
+        backgroundTransition: "fade",
+        totalTime: 1800,
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+      });
+    </script>
+  </body>
+</html>

@@ -29,3 +29,22 @@ jobs:
 
       - name: Run validator unit tests
         run: python -m unittest discover -s tests -v
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.13.1"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+
+      - name: Install presentation dependencies
+        run: npm ci --prefix presentation
+
+      - name: Build presentation
+        env:
+          PRESENTATION_GITHUB_REF: ${{ github.head_ref || github.ref_name }}
+          PRESENTATION_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: npm run build --prefix presentation
+
+      - name: Validate presentation
+        run: npm run validate --prefix presentation

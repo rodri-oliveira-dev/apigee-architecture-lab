@@ -28,6 +28,24 @@ No proxy, o `ProxyEndpoint` define a interface voltada ao consumidor e os fluxos
 
 Siga a ordem numérica. Compare o `PreFlow` dos módulos para perceber como a cadeia de políticas cresce e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 30 minutos.
 
+## Apresentação
+
+A apresentação técnica em português brasileiro usa Reveal.js, Markdown, destaque de XML, diagramas SVG locais e notas do apresentador. Os trechos de código e diagramas são extraídos dos arquivos do laboratório durante o build.
+
+```bash
+npm ci --prefix presentation
+npm start --prefix presentation
+```
+
+Abra <http://127.0.0.1:8000>. Navegue com as setas, pressione `O` para a visão geral e `S` para as notas do apresentador. Gere e valide a distribuição estática com:
+
+```bash
+npm run build --prefix presentation
+npm run validate --prefix presentation
+```
+
+O resultado fica em `presentation/dist/`; mantenha a pasta completa e sirva-a por HTTP. Os slides exibem o caminho de cada exemplo e oferecem links para o código correspondente no GitHub. Consulte o [guia específico da apresentação](presentation/README.md) para configuração de branch, porta alternativa e detalhes da geração.
+
 ## Validação local
 
 Requer Python 3.11 ou mais recente; não há dependências externas.

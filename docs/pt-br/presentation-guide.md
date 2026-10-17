@@ -2,6 +2,8 @@
 
 Público: desenvolvedores e arquitetos. Os tempos somam 30 minutos e deixam perguntas para depois da sessão.
 
+> A apresentação executável adapta este roteiro para 12 slides em [`presentation/`](../../presentation/README.md). O build extrai exemplos XML e diagramas diretamente dos arquivos citados abaixo.
+
 ## Slide 1 — Por que uma camada de API? (2 min)
 
 - **Objetivo:** alinhar problema e escopo.

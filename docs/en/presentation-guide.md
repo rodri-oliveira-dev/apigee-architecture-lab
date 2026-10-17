@@ -2,6 +2,8 @@
 
 Audience: developers and software architects. Timings total 30 minutes, with questions after the session.
 
+> The executable Brazilian Portuguese deck adapts this guide into 12 slides under [`presentation/`](../../presentation/README.md). Its build extracts XML examples and diagrams directly from the files referenced below.
+
 ## Slide 1 — Why an API layer? (2 min)
 
 - **Objective:** align on the problem and scope.

@@ -13,6 +13,16 @@ The script discovers every `apiproxy/` and `sharedflowbundle/`, parses XML with 
 
 `.github/workflows/validate.yml` runs the same validation and unit tests on pushes to `main` and pull requests targeting `main`. It has only `contents: read` permission and uses no secrets.
 
+The presentation has an additional reproducible validation path:
+
+```bash
+npm ci --prefix presentation
+npm run build --prefix presentation
+npm run validate --prefix presentation
+```
+
+It checks diagram generation, slide and note counts, XML excerpts, local references, and the integrity of packaged static assets.
+
 ## What is not checked
 
 The validator does not embed Apigee's full internal schema and cannot prove that a bundle will import or deploy. It does not validate condition expressions, organization-specific policy availability, external resources, runtime variable values, credentials, DNS/TLS, products/apps, or distributed quota behavior.
