@@ -10,6 +10,29 @@ permissions:
   contents: read
 
 jobs:
+  mermaid-validation:
+    name: Validate Mermaid diagrams
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.13.1"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+
+      - name: Install Mermaid renderer
+        run: npm ci --prefix presentation
+
+      - name: Validate all Markdown diagrams
+        run: npm run validate:mermaid --prefix presentation
+
   static-validation:
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -1,0 +1,138 @@
+{
+  "folders": [
+    {
+      "name": "apigee-architecture-lab",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "*.xml": "xml"
+    },
+    "[xml]": {
+      "editor.defaultFormatter": "redhat.vscode-xml"
+    },
+    "[markdown]": {
+      "editor.wordWrap": "on"
+    },
+    "files.exclude": {
+      "**/presentation/node_modules": true,
+      "**/presentation/dist": true
+    },
+    "search.exclude": {
+      "**/presentation/node_modules": true,
+      "**/presentation/dist": true
+    },
+    "terminal.integrated.cwd": "${workspaceFolder}"
+  },
+  "extensions": {
+    "recommendations": [
+      "redhat.vscode-xml",
+      "davidanson.vscode-markdownlint",
+      "bierner.markdown-mermaid"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Presentation: Install Dependencies",
+        "type": "shell",
+        "command": "npm",
+        "args": ["ci", "--prefix", "presentation"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Presentation: Build",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "build", "--prefix", "presentation"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Presentation: Start",
+        "type": "shell",
+        "command": "npm",
+        "args": ["start", "--prefix", "presentation"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "isBackground": true,
+        "problemMatcher": {
+          "owner": "presentation-server",
+          "pattern": {
+            "regexp": "^(.*)$",
+            "message": 1
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^> .* start$",
+            "endsPattern": "^Apresentação disponível em http://127\\.0\\.0\\.1:8000$"
+          }
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "focus": false
+        }
+      },
+      {
+        "label": "Presentation: Validate",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "validate", "--prefix", "presentation"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Presentation: Validate Mermaid",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "validate:mermaid", "--prefix", "presentation"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Apigee: Validate Bundles",
+        "type": "shell",
+        "command": "python",
+        "args": ["scripts/validate_bundles.py"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Tests: Run Unit Tests",
+        "type": "shell",
+        "command": "python",
+        "args": ["-m", "unittest", "discover", "-s", "tests", "-v"],
+        "options": { "cwd": "${workspaceFolder}" },
+        "problemMatcher": []
+      },
+      {
+        "label": "Quality: Validate All",
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "Apigee: Validate Bundles",
+          "Tests: Run Unit Tests",
+          "Presentation: Validate Mermaid",
+          "Presentation: Build",
+          "Presentation: Validate"
+        ],
+        "problemMatcher": []
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Presentation: Open in Browser",
+        "type": "pwa-chrome",
+        "request": "launch",
+        "url": "http://127.0.0.1:8000",
+        "webRoot": "${workspaceFolder}/presentation/dist",
+        "preLaunchTask": "Presentation: Start"
+      }
+    ]
+  }
+}

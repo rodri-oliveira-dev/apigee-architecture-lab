@@ -15,24 +15,22 @@ flowchart LR
 
 ## Message lifecycle
 
-On the request path, execution crosses the ProxyEndpoint and TargetEndpoint before reaching the backend. Response segments run in the reverse direction. Within a segment, Steps run in declaration order; an error with `continueOnError="false"` leaves the normal pipeline.
+On the request path, execution crosses the ProxyEndpoint and TargetEndpoint before reaching the backend. On the response path, endpoint traversal is reversed: TargetEndpoint first, then ProxyEndpoint. Inside each request or response pipeline, however, the order remains `PreFlow → Conditional Flow → PostFlow`. Only the first matching Conditional Flow runs in each segment. Within each Flow, Steps run in declaration order; an error with `continueOnError="false"` leaves the normal pipeline.
 
 ```mermaid
-sequenceDiagram
-    participant App
-    participant PE as ProxyEndpoint
-    participant TE as TargetEndpoint
-    participant API as Backend
-    App->>PE: request
-    PE->>PE: PreFlow → Conditional Flow → PostFlow
-    PE->>TE: RouteRule
-    TE->>TE: PreFlow → Conditional Flow → PostFlow
-    TE->>API: request
-    API-->>TE: response
-    TE->>TE: PostFlow → Conditional Flow → PreFlow
-    TE-->>PE: response
-    PE->>PE: PostFlow → Conditional Flow → PreFlow
-    PE-->>App: response
+flowchart TB
+    subgraph RES[Response]
+        direction RL
+        B2[Backend] --> TS["TargetEndpoint<br/>Pre → Conditional → Post"]
+        TS --> PS["ProxyEndpoint<br/>Pre → Conditional → Post"]
+        PS --> A2[Consumer]
+    end
+    subgraph REQ[Request]
+        direction LR
+        A[Consumer] --> PR["ProxyEndpoint<br/>Pre → Conditional → Post"]
+        PR -->|RouteRule| TR["TargetEndpoint<br/>Pre → Conditional → Post"]
+        TR --> B[Backend]
+    end
 ```
 
 ```mermaid
@@ -55,4 +53,4 @@ Policies are configuration, not substitutes for architecture decisions. Limits, 
 
 The bundles follow the documented layout and are checked for relationships the repository can prove. The platform must still validate schemas, policy availability, runtime variables, organization/environment resources, connectivity, and distributed behavior.
 
-References: [proxy structure](https://cloud.google.com/apigee/docs/api-platform/fundamentals/structure-api-proxies), [flow configuration](https://cloud.google.com/apigee/docs/api-platform/reference/flow-configuration-reference), and [flow variables](https://cloud.google.com/apigee/docs/api-platform/fundamentals/introduction-flow-variables).
+References: [proxy structure](https://cloud.google.com/apigee/docs/api-platform/fundamentals/structure-api-proxies), [flow execution order](https://cloud.google.com/apigee/docs/api-platform/fundamentals/what-are-flows), [proxy configuration](https://cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference), and [flow variables](https://cloud.google.com/apigee/docs/api-platform/fundamentals/introduction-flow-variables).
