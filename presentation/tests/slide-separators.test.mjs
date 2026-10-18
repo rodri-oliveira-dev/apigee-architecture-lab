@@ -17,6 +17,7 @@ test("Reveal.js reconhece todos os slides definidos no Markdown", () => {
 test("um separador sem linha em branco antes não pode passar despercebido", () => {
   assert.ok(separator);
   const revealSeparator = new RegExp(separator, "gm");
-  assert.equal("Notas finais\n---\nPróximo slide".split(revealSeparator).length, 1);
-  assert.equal("Notas finais\n\n---\nPróximo slide".split(revealSeparator).length, 2);
+  assert.equal("Notas finais\n---\n\nPróximo slide".split(revealSeparator).length, 1, "sem linha em branco antes");
+  assert.equal("Notas finais\n\n---\nPróximo slide".split(revealSeparator).length, 1, "sem linha em branco depois");
+  assert.equal("Notas finais\n\n---\n\nPróximo slide".split(revealSeparator).length, 2, "com linhas em branco nos dois lados");
 });
