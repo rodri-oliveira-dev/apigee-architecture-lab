@@ -4,7 +4,9 @@
   <Description>Orders proxy with access control, traffic management and message enrichment.</Description>
   <Policies>
     <Policy>assign-correlation-id</Policy>
+    <Policy>assign-list-orders-context</Policy>
     <Policy>quota</Policy>
+    <Policy>remove-api-key</Policy>
     <Policy>spike-arrest</Policy>
     <Policy>verify-api-key</Policy>
   </Policies>

@@ -4,6 +4,7 @@
   <PreFlow name="PreFlow">
     <Request>
       <Step><Name>verify-api-key</Name></Step>
+      <Step><Name>remove-api-key</Name></Step>
       <Step><Name>spike-arrest</Name></Step>
       <Step><Name>quota</Name></Step>
       <Step><Name>assign-correlation-id</Name></Step>
@@ -12,8 +13,10 @@
   </PreFlow>
   <Flows>
     <Flow name="list-orders">
-      <Description>Matches only collection reads.</Description>
-      <Request/>
+      <Description>Marks collection reads with operation context for the backend.</Description>
+      <Request>
+        <Step><Name>assign-list-orders-context</Name></Step>
+      </Request>
       <Response/>
       <Condition>(proxy.pathsuffix = "/") and (request.verb = "GET")</Condition>
     </Flow>

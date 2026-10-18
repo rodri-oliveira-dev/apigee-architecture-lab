@@ -98,8 +98,57 @@ class ValidatorTests(unittest.TestCase):
             self.assertIn("DOC001", [item.code for item in validate_repository(root)])
 
 
+class IntermediateBundleContractTests(unittest.TestCase):
+    root = Path(__file__).resolve().parents[1]
+    bundle = root / "examples/02-intermediate/apiproxy"
+
+    def test_api_key_is_verified_then_removed_before_traffic_policies(self):
+        proxy = ET.parse(self.bundle / "proxies/default.xml").getroot()
+        steps = [node.text for node in proxy.findall("./PreFlow/Request/Step/Name")]
+        self.assertEqual(
+            [
+                "verify-api-key",
+                "remove-api-key",
+                "spike-arrest",
+                "quota",
+                "assign-correlation-id",
+            ],
+            steps,
+        )
+
+        removal = ET.parse(self.bundle / "policies/remove-api-key.xml").getroot()
+        self.assertEqual("x-api-key", removal.find("./Remove/Headers/Header").get("name"))
+
+    def test_quota_is_partitioned_by_verified_consumer_key(self):
+        quota = ET.parse(self.bundle / "policies/quota.xml").getroot()
+        self.assertEqual(
+            "verifyapikey.verify-api-key.client_id",
+            quota.find("Identifier").get("ref"),
+        )
+
+    def test_list_orders_conditional_flow_executes_safe_declarative_step(self):
+        proxy = ET.parse(self.bundle / "proxies/default.xml").getroot()
+        flow = proxy.find("./Flows/Flow[@name='list-orders']")
+        self.assertEqual("assign-list-orders-context", flow.findtext("./Request/Step/Name"))
+        self.assertEqual(
+            '(proxy.pathsuffix = "/") and (request.verb = "GET")',
+            flow.findtext("Condition"),
+        )
+
+
 class AdvancedBundleContractTests(unittest.TestCase):
     root = Path(__file__).resolve().parents[1]
+    bundle = root / "examples/03-advanced/orders-advanced/apiproxy"
+
+    def test_bearer_token_is_verified_then_removed_before_shared_flow(self):
+        proxy = ET.parse(self.bundle / "proxies/default.xml").getroot()
+        steps = [node.text for node in proxy.findall("./PreFlow/Request/Step/Name")]
+        self.assertEqual(
+            ["verify-jwt", "remove-authorization", "call-shared-security"],
+            steps,
+        )
+        removal = ET.parse(self.bundle / "policies/remove-authorization.xml").getroot()
+        self.assertEqual("Authorization", removal.find("./Remove/Headers/Header").get("name"))
 
     def test_all_jwt_policy_failures_use_authentication_fault(self):
         proxy = ET.parse(
@@ -108,12 +157,34 @@ class AdvancedBundleContractTests(unittest.TestCase):
         condition = proxy.findtext("./FaultRules/FaultRule[@name='jwt-fault']/Condition")
         self.assertEqual("JWT.failed = true", condition)
 
-    def test_target_errors_use_safe_default_fault(self):
+    def test_target_connection_errors_use_safe_bad_gateway_fault(self):
         target = ET.parse(
             self.root / "examples/03-advanced/orders-advanced/apiproxy/targets/default.xml"
         ).getroot()
         policy = target.findtext("./DefaultFaultRule/Step/Name")
-        self.assertEqual("assign-default-fault", policy)
+        self.assertEqual("assign-target-fault", policy)
+        target_fault = ET.parse(
+            self.root / "examples/03-advanced/orders-advanced/apiproxy/policies/assign-target-fault.xml"
+        ).getroot()
+        self.assertEqual("502", target_fault.findtext("./Set/StatusCode"))
+
+    def test_backend_http_errors_keep_status_and_sanitize_payload(self):
+        target = ET.parse(
+            self.root / "examples/03-advanced/orders-advanced/apiproxy/targets/default.xml"
+        ).getroot()
+        self.assertEqual(
+            "1xx,2xx,3xx,4xx,5xx",
+            target.findtext("./HTTPTargetConnection/Properties/Property[@name='success.codes']"),
+        )
+        step = target.find("./PreFlow/Response/Step")
+        self.assertEqual("sanitize-backend-error", step.findtext("Name"))
+        self.assertEqual("response.status.code >= 400", step.findtext("Condition"))
+
+        sanitizer = ET.parse(
+            self.root / "examples/03-advanced/orders-advanced/apiproxy/policies/sanitize-backend-error.xml"
+        ).getroot()
+        self.assertIsNone(sanitizer.find("./Set/StatusCode"))
+        self.assertNotIn("fault.", sanitizer.findtext("./Set/Payload"))
 
 
 if __name__ == "__main__":

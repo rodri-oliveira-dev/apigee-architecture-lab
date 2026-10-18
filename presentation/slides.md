@@ -267,7 +267,7 @@ Notas:
 
 **Contexto arquitetural:** A posição determina qual mensagem e qual contexto uma policy enxerga. Confundir a inversão entre endpoints com a ordem interna pode colocar transformação, logging ou tratamento no ponto errado.
 
-**Demonstração:** Abra `docs/pt-br/architecture.md` e siga as setas do segundo Mermaid. Depois abra `examples/02-intermediate/apiproxy/proxies/default.xml`: o flow `list-orders` casa com `GET /`, mas seus blocos `Request` e `Response` estão vazios. Ele ensina a estrutura; não executa ação de negócio.
+**Demonstração:** Abra `docs/pt-br/architecture.md` e siga as setas do segundo Mermaid. Depois abra `examples/02-intermediate/apiproxy/proxies/default.xml`: o flow `list-orders` casa com `GET /` e executa somente a policy declarativa que adiciona `x-api-operation`. Ele demonstra a posição do Conditional Flow sem levar regra de negócio ao gateway.
 
 **Arquivos demonstrados:** `docs/pt-br/architecture.md` e `examples/02-intermediate/apiproxy/proxies/default.xml`.
 
@@ -277,45 +277,45 @@ Notas:
 
 <!-- .slide: data-timing="180" -->
 
-## Autenticar antes de contabilizar
+## Autenticar, minimizar e contabilizar
 
 <div class="split policy-slide">
 <div>
 
-{{xml:examples/02-intermediate/apiproxy/policies/verify-api-key.xml|2:5|1|3}}
+{{xml:examples/02-intermediate/apiproxy/policies/verify-api-key.xml|3:4|3-4}}
 
 <div class="source-line"><code>verify-api-key.xml</code> · {{github:examples/02-intermediate/apiproxy/policies/verify-api-key.xml|Ver código}}</div>
 
 </div>
 <div>
 
-{{xml:examples/02-intermediate/apiproxy/policies/quota.xml|2:10|3-8}}
+{{xml:examples/02-intermediate/apiproxy/policies/quota.xml|3:8|3-8}}
 
 <div class="source-line"><code>quota.xml</code> · {{github:examples/02-intermediate/apiproxy/policies/quota.xml|Ver código}}</div>
 
 </div>
 </div>
 
-<div class="pipeline"><b>VerifyAPIKey</b><i>→</i><span>SpikeArrest</span><i>→</i><span>Quota por <code>client_id</code></span><i>→</i><span>correlation ID</span></div>
+<div class="pipeline"><b>Validar chave</b><i>→</i><span>remover <code>x-api-key</code></span><i>→</i><span>SpikeArrest</span><i>→</i><span>Quota por chave</span><i>→</i><span>correlação</span></div>
 
 Notas:
-**Mensagem principal:** A ordem das policies expressa dependências de identidade, proteção operacional, consumo e enriquecimento.
+**Mensagem principal:** A ordem das policies valida a credencial, reduz sua exposição e só então aplica os controles que dependem do contexto verificado.
 
 **Abertura:** No módulo intermediário, a sequência não é estética; uma policy produz o contexto que a seguinte consome.
 
-**Explicação principal:** `VerifyAPIKey` lê `x-api-key`, valida a aplicação e disponibiliza variáveis como `verifyapikey.verify-api-key.client_id`. Isso identifica a aplicação, não necessariamente o usuário final. `SpikeArrest` vem antes da Quota para controlar rajadas; com `UseEffectiveCount=true` e sem `Identifier`, o exemplo usa contagem regional para o proxy inteiro. A Quota usa o `client_id` e limita cada aplicação a cem chamadas por minuto numa janela móvel. Por fim, `AssignMessage` adiciona `messageid` como correlação na requisição ao backend.
+**Explicação principal:** `VerifyAPIKey` lê `x-api-key`, valida a credencial emitida para uma aplicação e produz metadados. Aqui, `client_id` é a própria consumer key, não o ID lógico da aplicação. Eu removo o header logo depois da validação; as variáveis verificadas continuam disponíveis. `SpikeArrest` controla rajadas para o proxy, a Quota limita cada chave a cem chamadas por minuto e a última policy adiciona correlação.
 
-**Contexto arquitetural:** API key depende de API product, developer app e chave no plano de gestão. Os números são didáticos e precisam de testes de capacidade e contrato de produto antes de qualquer uso real.
+**Contexto arquitetural:** API key depende de API product, developer app e chave no plano de gestão. Duas chaves da mesma app — inclusive durante rotação — acumulam quotas separadas neste desenho. Os números são didáticos e precisam de testes de capacidade e contrato de produto antes de qualquer uso real.
 
-**Demonstração:** Abra o `PreFlow` em `examples/02-intermediate/apiproxy/proxies/default.xml` e percorra os quatro Steps. Em seguida compare `spike-arrest.xml`, `quota.xml` e `assign-correlation-id.xml`.
+**Demonstração:** Abra o `PreFlow` em `examples/02-intermediate/apiproxy/proxies/default.xml` e percorra os cinco Steps. Mostre `remove-api-key.xml`, compare o `Identifier` de `quota.xml` e finalize no Conditional Flow, que acrescenta apenas `x-api-operation: list-orders` em `GET /`.
 
-**Arquivos demonstrados:** `examples/02-intermediate/apiproxy/proxies/default.xml` e os quatro XMLs em `examples/02-intermediate/apiproxy/policies/`.
+**Arquivos demonstrados:** `examples/02-intermediate/apiproxy/proxies/default.xml`, `verify-api-key.xml`, `remove-api-key.xml`, `quota.xml` e `assign-list-orders-context.xml`.
 
 **Transição:** No módulo avançado, a mesma ideia de cadeia passa a combinar identidade assinada, reuso e um contrato explícito de falhas.
 
 ---
 
-<!-- .slide: data-timing="200" -->
+<!-- .slide: data-timing="180" -->
 
 ## Confiança, reuso e falhas explícitas
 
@@ -323,29 +323,27 @@ Notas:
 <div class="diagram-frame">
   {{mermaid:examples/03-advanced/README.md|1|advanced-flow|JWT e Shared Flow no módulo avançado}}
 </div>
-<div>
-
-{{xml:examples/03-advanced/orders-advanced/apiproxy/policies/verify-jwt.xml|2:11|3-9}}
-
-<div class="source-line"><code>verify-jwt.xml</code> · {{github:examples/03-advanced/orders-advanced/apiproxy/policies/verify-jwt.xml|Ver código completo}}</div>
-
+<div class="responsibility-stack">
+  <div><span>CONFIANÇA</span><strong>VerifyJWT</strong><small>validar claims e remover o bearer token</small></div>
+  <div><span>REUSO</span><strong>FlowCallout</strong><small>Shared Flow propaga o subject validado</small></div>
+  <div><span>FALHAS</span><strong>Responder por categoria</strong><small>JWT 401 · proxy 500 · conexão 502 · backend preservado</small></div>
 </div>
 </div>
 
-<div class="advanced-pills"><span>RS256 + JWKS</span><span>issuer + audience</span><span>FlowCallout</span><span>401 conhecido · 500 fallback</span></div>
+<div class="source-line"><code>examples/03-advanced/</code> · {{github:examples/03-advanced/README.md|Ver implementação e limites}}</div>
 
 Notas:
-**Mensagem principal:** A confiança nasce da validação completa do token, e o reuso e as falhas precisam de dependências explícitas.
+**Mensagem principal:** O fluxo avançado separa três responsabilidades: validar confiança, reutilizar contexto e responder conforme a origem da falha.
 
 **Abertura:** O módulo avançado troca a identidade de aplicação por um token assinado e acrescenta duas preocupações: compartilhar comportamento e responder com segurança quando algo falha.
 
-**Explicação principal:** `VerifyJWT` valida RS256 usando o JWKS de `private.orders.jwks`, exige os claims declarados e compara issuer e audience. Expiração e `not-before`, quando presentes, também são verificadas pela policy. Depois, `FlowCallout` chama `orders-security-shared`, que copia o subject já validado para o header de destino. Se uma policy JWT falhar, `JWT.failed = true` aciona a FaultRule de 401. Quando nenhuma FaultRule específica executa, a DefaultFaultRule do endpoint oferece o fallback seguro de 500.
+**Explicação principal:** `VerifyJWT` valida RS256 usando o JWKS de `private.orders.jwks`, exige os claims declarados e compara issuer e audience. Depois da validação, o header `Authorization` é removido. O `FlowCallout` chama `orders-security-shared`, que copia somente o subject validado para o request do target. No erro, eu separo categorias: `JWT.failed` leva a 401, outra falha local do proxy usa 500, falta de resposta do target usa 502 e uma resposta 4xx/5xx do backend mantém o status com corpo neutro.
 
-**Contexto arquitetural:** O Shared Flow deve estar implantado antes do proxy consumidor, na mesma organização e environment. O exemplo não obtém nem rotaciona JWKS, não autoriza por scopes e não testa runtime. Falha fechada aqui significa que `continueOnError="false"` tira a mensagem do fluxo normal; não significa que todo erro possível tenha sido modelado.
+**Contexto arquitetural:** `JWT.failed` cobre todas as falhas de runtime de policies JWT, inclusive categorias ligadas a chave ou configuração; não é sinônimo apenas de assinatura inválida. O agrupamento em 401 mantém o exemplo pequeno, mas produção deve monitorar e separar falhas operacionais. O Shared Flow precisa estar implantado antes do proxy no mesmo environment.
 
-**Demonstração:** Mostre `verify-jwt.xml`, depois o PreFlow e as FaultRules do ProxyEndpoint. Abra `call-shared-security.xml` e o único Step de `orders-security-shared`. Por fim, mostre a DefaultFaultRule separada no TargetEndpoint para erros que ocorram ali.
+**Demonstração:** Mostre somente a cadeia `verify-jwt → remove-authorization → call-shared-security` no PreFlow e o único Step do Shared Flow. Deixe a matriz de falhas nas notas; se perguntarem, abra `targets/default.xml` para mostrar `success.codes`, sanitização do payload e o fallback 502.
 
-**Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/policies/verify-jwt.xml`, `call-shared-security.xml`, `proxies/default.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
+**Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml`, `verify-jwt.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
 
 **Transição:** Esses exemplos técnicos podem ser resumidos em poucos guardrails para orientar decisões maiores de arquitetura.
 
@@ -383,16 +381,16 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="160" -->
+<!-- .slide: data-timing="180" -->
 
 ## Demonstração: siga a evolução
 
 <div class="demo-path">
-  <div><span>01</span><strong>Básico</strong><small>fronteira + RouteRule</small></div>
+  <div><span>01 · 35 s</span><strong>Básico</strong><small>ProxyEndpoint + RouteRule</small></div>
   <i>→</i>
-  <div><span>02</span><strong>Intermediário</strong><small>API key + tráfego</small></div>
+  <div><span>02 · 55 s</span><strong>Intermediário</strong><small>ordem das policies</small></div>
   <i>→</i>
-  <div><span>03</span><strong>Avançado</strong><small>JWT + reuso + falhas</small></div>
+  <div><span>03 · 50 s</span><strong>Avançado</strong><small>JWT + Shared Flow</small></div>
 </div>
 
 ```bash
@@ -411,11 +409,11 @@ Notas:
 
 **Abertura:** Na demonstração, eu sigo sempre a mesma trilha para não transformar a navegação em uma caça a arquivos.
 
-**Explicação principal:** Primeiro comparo os ProxyEndpoints dos módulos básico e intermediário. Depois percorro o PreFlow intermediário e mostro o Conditional Flow vazio. No avançado, abro os dois bundles para deixar clara a dependência entre proxy e Shared Flow. Por fim executo o validador e os testes.
+**Explicação principal:** Primeiro mostro no ProxyEndpoint básico onde ficam PreFlow, PostFlow e RouteRule. Depois percorro a sequência intermediária, destacando remoção da chave, Quota por credencial e o Step do Conditional Flow. No avançado, mostro `VerifyJWT`, `FlowCallout` e o único Step compartilhado. Reservo os quarenta segundos finais para o validador e os testes.
 
 **Contexto arquitetural:** A saída prova estrutura XML, nomes, Steps, RouteRules, FlowCallouts e documentação obrigatória. Ela não valida expressions, schemas internos, produtos, credenciais, DNS, TLS, importação, deploy nem comportamento de runtime.
 
-**Demonstração:** Execute os dois comandos da tela a partir da raiz. Se houver tempo, execute também `npm run validate:mermaid --prefix presentation`, `npm run build --prefix presentation` e `npm run validate --prefix presentation`. Os links continuam úteis online, mas os caminhos visíveis permitem a demo offline.
+**Demonstração:** Antes da sessão, deixe os quatro pontos já abertos e o terminal na raiz. Siga os tempos exibidos sem abrir READMEs. Execute os dois comandos da tela nos quarenta segundos finais; as validações completas da apresentação ficam preparadas previamente e documentadas no repositório.
 
 **Arquivos demonstrados:** `examples/01-basic/`, `examples/02-intermediate/`, `examples/03-advanced/`, `scripts/validate_bundles.py` e `tests/`.
 

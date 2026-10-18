@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Quota name="quota" type="rollingwindow" continueOnError="false" enabled="true">
-  <DisplayName>Quota per Client Application</DisplayName>
+  <DisplayName>Quota per Consumer Key</DisplayName>
   <Identifier ref="verifyapikey.verify-api-key.client_id"/>
   <Allow count="100"/>
   <Interval>1</Interval>

@@ -2,18 +2,19 @@
 
 ## Português
 
-**Problema:** impedir acesso anônimo, controlar rajadas, limitar consumo por aplicação e propagar correlação. O exemplo acrescenta um fluxo condicional para `GET /` como marcador estrutural: seus blocos `Request` e `Response` estão vazios, portanto ele não executa lógica de negócio. O objetivo é mostrar onde Steps específicos da operação poderiam ser anexados.
+**Problema:** impedir acesso anônimo, controlar rajadas, limitar consumo por credencial e propagar apenas o contexto necessário ao backend. O exemplo também torna concreto o Conditional Flow de `GET /`: ele acrescenta `x-api-operation: list-orders`, um metadado técnico fixo, sem executar lógica de negócio.
 
-**Responsabilidade dos arquivos:** o descritor `orders-intermediate.xml` nomeia o bundle; o ProxyEndpoint ordena policies e declara o Conditional Flow; o TargetEndpoint contém o destino fictício. Em `policies/`, `verify-api-key.xml` lê `x-api-key`; `spike-arrest.xml` limita o proxy a `10ps` com contagem efetiva regional (`UseEffectiveCount=true`), sem identificador por cliente; `quota.xml` limita cada `client_id` verificado a 100 chamadas por minuto; `assign-correlation-id.xml` envia o `messageid` ao backend.
+**Responsabilidade dos arquivos:** o descritor `orders-intermediate.xml` nomeia o bundle; o ProxyEndpoint ordena policies e declara o Conditional Flow; o TargetEndpoint contém o destino fictício. Em `policies/`, `verify-api-key.xml` lê `x-api-key`; `remove-api-key.xml` retira a credencial validada da requisição; `spike-arrest.xml` limita o proxy a `10ps` com contagem efetiva regional (`UseEffectiveCount=true`), sem identificador por cliente; `quota.xml` limita cada consumer key validada a 100 chamadas por minuto; `assign-correlation-id.xml` envia o `messageid`; e `assign-list-orders-context.xml` marca somente a operação `GET /`.
 
 ```mermaid
 flowchart TD
     A[Request PreFlow] --> K[1. VerifyAPIKey]
-    K --> S[2. SpikeArrest]
-    S --> Q[3. Quota por client_id]
-    Q --> C[4. AssignMessage: correlation ID]
+    K --> X[2. Remover x-api-key]
+    X --> S[3. SpikeArrest]
+    S --> Q[4. Quota por consumer key]
+    Q --> C[5. Correlation ID]
     C --> D{GET e path /?}
-    D -->|sim| F[Conditional Flow list-orders]
+    D -->|sim| F[Conditional Flow:<br/>x-api-operation]
     D -->|não| P[PostFlow]
     F --> P
     P --> R[RouteRule]
@@ -27,17 +28,19 @@ sequenceDiagram
     C->>A: GET / + x-api-key
     A->>M: VerifyAPIKey
     alt chave válida e autorizada
-        M-->>A: client_id
-        A->>A: SpikeArrest → Quota → AssignMessage
+        M-->>A: consumer key + metadados da app
+        A->>A: remove chave → SpikeArrest → Quota
         A-->>C: encaminha/responde
     else ausente, inválida ou não autorizada
         A-->>C: falha da policy, pipeline normal é interrompido
     end
 ```
 
-**Comportamento e dependências:** a configuração é analisável estaticamente, mas `VerifyAPIKey` só funciona com API product, developer app e chave associados ao proxy/recurso. A Quota depende do `client_id` produzido pela policy anterior. SpikeArrest protege o proxy contra rajadas com uma janela deslizante regional; Quota governa o consumo de cada aplicação em uma janela móvel. Não são controles equivalentes.
+**Identidade e Quota:** a configuração é analisável estaticamente, mas `VerifyAPIKey` só funciona com API product, developer app e consumer key associados ao proxy/recurso. A variável `verifyapikey.verify-api-key.client_id` contém a própria consumer key apresentada — sinônimo de API key/app key — e não o ID lógico da aplicação. A policy também produz metadados como `developer.app.name`; este laboratório usa a credencial como `Identifier` da Quota. Portanto, duas chaves válidas da mesma aplicação têm contadores distintos e a rotação para uma nova chave inicia outro contador. Essa escolha é simples e útil para ensinar a dependência entre policies, mas não deve ser descrita como uma quota agregada por aplicação.
 
-**Boas práticas:** autenticar antes de contabilizar a quota por consumidor; dimensionar limites com testes; não usar `messageid` como identificador de negócio; definir respostas de erro consistentes (introduzidas no módulo 03). `Distributed` e `Synchronous` dão contagem coordenada, mas a sincronização por chamada pode reduzir throughput e deve ser uma escolha consciente. O backend continua deliberadamente ausente.
+**Comportamento esperado:** após uma chave válida ser verificada, `x-api-key` é removido antes do roteamento, pois o backend não precisa dessa credencial. SpikeArrest protege o proxy contra rajadas com uma janela deslizante regional; Quota governa cada consumer key numa janela móvel. Para `GET /`, o primeiro Conditional Flow compatível executa e adiciona o header técnico `x-api-operation`; outras operações seguem ao PostFlow sem esse Step. SpikeArrest e Quota não são controles equivalentes.
+
+**Boas práticas e limites:** validar antes de remover a credencial e contabilizar a quota; não propagar segredos sem necessidade; dimensionar limites com testes; não usar `messageid` como identificador de negócio. `Distributed` e `Synchronous` dão contagem coordenada, mas a sincronização por chamada pode reduzir throughput e deve ser uma escolha consciente. Uma quota realmente agregada por aplicação exigiria escolher um identificador estável compatível com o domínio e com as recomendações da plataforma; isso fica fora do laboratório. O backend continua deliberadamente ausente.
 
 ## English
 

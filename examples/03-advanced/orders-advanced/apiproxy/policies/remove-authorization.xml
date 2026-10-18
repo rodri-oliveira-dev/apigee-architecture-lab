@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="remove-authorization" continueOnError="false" enabled="true">
+  <DisplayName>Remove Authorization Before Routing</DisplayName>
+  <Remove>
+    <Headers>
+      <Header name="Authorization"/>
+    </Headers>
+  </Remove>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>
