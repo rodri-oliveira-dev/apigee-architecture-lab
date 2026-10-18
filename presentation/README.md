@@ -35,7 +35,7 @@ npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-O build gera `presentation/dist/`, uma pasta autocontida para servir por HTTP. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
+O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Seus recursos são locais, exceto a foto do slide “Sobre mim”, obtida do portfólio público e que requer conexão para ser exibida. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
 
 ## Publicação no GitHub Pages
 
