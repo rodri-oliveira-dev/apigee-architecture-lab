@@ -8,8 +8,9 @@
     "start": "npm run build && node scripts/serve.mjs",
     "build": "node scripts/generate-speaker-script.mjs --check && node scripts/build.mjs",
     "generate:speaker-script": "node scripts/generate-speaker-script.mjs",
+    "test": "node --test tests/*.test.mjs",
     "validate": "node scripts/generate-speaker-script.mjs --check && node scripts/validate.mjs",
-    "validate:mermaid": "node scripts/validate-mermaid.mjs",
+    "validate:mermaid": "npm test --silent && node scripts/validate-mermaid.mjs",
     "validate:visual": "node scripts/visual-check.mjs"
   },
   "engines": {

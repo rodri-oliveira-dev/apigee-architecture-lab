@@ -71,7 +71,7 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 - links de código são construídos a partir do remote e da referência Git configurados;
 - o resultado final é gravado somente em `dist/`.
 
-`npm run validate:mermaid` renderiza todos os blocos Mermaid encontrados nos arquivos Markdown e informa arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
+`npm run validate:mermaid` testa o parser e renderiza todos os blocos Mermaid encontrados nos arquivos Markdown, inclusive cercas com até três espaços de indentação, informando arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
 
 Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium a 1920×1080, detecta overflow e notas visíveis e grava capturas temporárias em `presentation/dist/visual-check/`.
 

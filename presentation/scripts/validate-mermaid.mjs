@@ -3,6 +3,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderMermaid } from "@mermaid-js/mermaid-cli";
 import puppeteer from "puppeteer";
+import { mermaidBlocks } from "./mermaid-blocks.mjs";
 
 const presentationRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(presentationRoot, "..");
@@ -20,31 +21,6 @@ function markdownFiles(directory) {
       if (entry.isDirectory()) return markdownFiles(path);
       return entry.isFile() && entry.name.endsWith(".md") ? [path] : [];
     });
-}
-
-function mermaidBlocks(path) {
-  const lines = readFileSync(path, "utf8").replace(/\r\n/g, "\n").split("\n");
-  const blocks = [];
-  let current = null;
-
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
-    if (!current && /^```mermaid\s*$/.test(line)) {
-      current = { line: index + 1, content: [] };
-      continue;
-    }
-    if (current && /^```\s*$/.test(line)) {
-      blocks.push({ line: current.line, source: current.content.join("\n") });
-      current = null;
-      continue;
-    }
-    if (current) current.content.push(line);
-  }
-
-  if (current) {
-    throw new Error(`bloco Mermaid iniciado na linha ${current.line} não foi fechado`);
-  }
-  return blocks;
 }
 
 function conciseError(error) {
