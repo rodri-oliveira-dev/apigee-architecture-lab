@@ -26,19 +26,19 @@ A proposta é aproximar duas perspectivas: para quem desenvolve, onde cada polic
 
 **Tempo estimado:** 1 min
 
-**Mensagem principal:** Minha experiência com sistemas distribuídos e APIs orienta uma leitura prática do Apigee, sem perder a visão de governança.
+**Mensagem principal:** Mais de 20 anos de experiência em software e sistemas distribuídos orientam minha leitura prática do Apigee e da governança de APIs.
 
 **Fala sugerida:**
 
-Eu sou o Rodrigo Oliveira, arquiteto de software, e boa parte do meu trabalho acontece justamente nas fronteiras entre sistemas.
+Eu sou o Rodrigo de Oliveira, arquiteto de software, e trabalho há mais de 20 anos com o desenvolvimento e a evolução de sistemas corporativos.
 
-Minha experiência passa por .NET, sistemas distribuídos, APIs e arquitetura cloud. Também me interesso bastante por qualidade, governança e projetos open source, porque arquitetura só ganha valor quando pode ser entendida, testada e evoluída por outras pessoas.
+Minha trajetória passa por .NET, automação, aplicações backend, integrações e sistemas distribuídos. Hoje participo do desenho e revisão de soluções, da definição de padrões técnicos e do acompanhamento da implementação com os times de engenharia. Esse olhar para as fronteiras entre sistemas é a origem do recorte prático desta apresentação.
 
-Fora do trabalho, estudo filosofia, leio muito e não dispenso um bom café. Essa curiosidade ajuda a fazer a pergunta que guia esta apresentação: quando colocamos uma camada entre consumidor e backend, qual problema estamos realmente resolvendo?
+Fora do código, sou estudante de Filosofia e gosto de leitura, café, jogos retrô e de estar com minha família e meus gatos. Acredito que boas perguntas importam tanto quanto boas respostas. Isso também vale para arquitetura: antes de escolher uma ferramenta, é preciso entender o problema que ela resolve.
 
-**Arquivos demonstrados:** Nenhum; os links públicos do GitHub e do site pessoal estão disponíveis no próprio slide.
+**Arquivos demonstrados:** Nenhum; foto, descrição profissional e interesses foram adaptados do meu portfólio público, disponível no próprio slide.
 
-**Transição:** Para responder a essa pergunta, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
+**Transição:** Para responder à pergunta sobre o problema que o gateway resolve, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
 
 ## 3. APIs crescem. A complexidade também.
 

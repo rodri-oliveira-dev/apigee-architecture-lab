@@ -38,30 +38,35 @@ Notas:
 
 ## Sobre mim
 
-<div class="about-grid">
-  <div><span>ATUAÇÃO</span><strong>Rodrigo Oliveira</strong><small>Arquiteto de Software</small></div>
-  <div><span>EXPERIÊNCIA</span><strong>APIs e sistemas distribuídos</strong><small>.NET, arquitetura cloud e governança</small></div>
-  <div><span>FORA DO DIAGRAMA</span><strong>Filosofia, leitura e café</strong><small>Curiosidade aplicada à engenharia</small></div>
+<div class="about-layout">
+  <img class="about-photo" src="https://rodri-oliveira-dev.github.io/assets/profile/rodrigo-about.webp" alt="Retrato de Rodrigo de Oliveira" width="320" height="428" decoding="async">
+  <div class="about-intro">
+    <h3>Rodrigo de Oliveira</h3>
+    <p class="about-role">Arquiteto de Software · .NET · Sistemas Distribuídos · Cloud</p>
+    <p class="about-bio">Há mais de 20 anos trabalho com desenvolvimento e evolução de sistemas corporativos, especialmente aplicações backend, integrações e sistemas distribuídos.</p>
+    <p class="about-bio">Hoje atuo no desenho e revisão de soluções, na definição de padrões técnicos e junto aos times de engenharia.</p>
+    <p class="about-personal"><strong>Além do código:</strong> Filosofia, leitura, um bom café, jogos retrô e momentos com minha família e meus gatos.</p>
+  </div>
 </div>
 
 <div class="profile-links">
-  <a href="https://github.com/rodri-oliveira-dev" target="_blank" rel="noopener noreferrer">github.com/rodri-oliveira-dev</a>
-  <a href="https://rodri-oliveira-dev.github.io/" target="_blank" rel="noopener noreferrer">rodri-oliveira-dev.github.io</a>
+  <a href="https://rodri-oliveira-dev.github.io/" target="_blank" rel="noopener noreferrer">Portfólio</a>
+  <a href="https://www.linkedin.com/in/rodri-oliveira-dev" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  <a href="https://github.com/rodri-oliveira-dev" target="_blank" rel="noopener noreferrer">GitHub</a>
 </div>
 
 Notas:
-**Mensagem principal:** Minha experiência com sistemas distribuídos e APIs orienta uma leitura prática do Apigee, sem perder a visão de governança.
+**Mensagem principal:** Mais de 20 anos de experiência em software e sistemas distribuídos orientam minha leitura prática do Apigee e da governança de APIs.
 
-**Abertura:** Eu sou o Rodrigo Oliveira, arquiteto de software, e boa parte do meu trabalho acontece justamente nas fronteiras entre sistemas.
+**Abertura:** Eu sou o Rodrigo de Oliveira, arquiteto de software, e trabalho há mais de 20 anos com o desenvolvimento e a evolução de sistemas corporativos.
 
-**Explicação principal:** Minha experiência passa por .NET, sistemas distribuídos, APIs e arquitetura cloud. Também me interesso bastante por qualidade, governança e projetos open source, porque arquitetura só ganha valor quando pode ser entendida, testada e evoluída por outras pessoas.
+**Explicação principal:** Minha trajetória passa por .NET, automação, aplicações backend, integrações e sistemas distribuídos. Hoje participo do desenho e revisão de soluções, da definição de padrões técnicos e do acompanhamento da implementação com os times de engenharia. Esse olhar para as fronteiras entre sistemas é a origem do recorte prático desta apresentação.
 
-**Contexto arquitetural:** Fora do trabalho, estudo filosofia, leio muito e não dispenso um bom café. Essa curiosidade ajuda a fazer a pergunta que guia esta apresentação: quando colocamos uma camada entre consumidor e backend, qual problema estamos realmente resolvendo?
+**Contexto arquitetural:** Fora do código, sou estudante de Filosofia e gosto de leitura, café, jogos retrô e de estar com minha família e meus gatos. Acredito que boas perguntas importam tanto quanto boas respostas. Isso também vale para arquitetura: antes de escolher uma ferramenta, é preciso entender o problema que ela resolve.
 
-**Arquivos demonstrados:** Nenhum; os links públicos do GitHub e do site pessoal estão disponíveis no próprio slide.
+**Arquivos demonstrados:** Nenhum; foto, descrição profissional e interesses foram adaptados do meu portfólio público, disponível no próprio slide.
 
-**Transição:** Para responder a essa pergunta, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
-
+**Transição:** Para responder à pergunta sobre o problema que o gateway resolve, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
 ---
 
 <!-- .slide: data-timing="110" -->

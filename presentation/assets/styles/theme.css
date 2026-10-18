@@ -118,24 +118,39 @@ body,
   text-align: center;
 }
 
-.about-grid {
+.about-layout {
+  align-items: center;
   display: grid;
-  gap: 0.7em;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 1.2em;
+  gap: 1.2em;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.55fr);
+  margin-top: 0.65em;
 }
-.about-grid > div {
-  background: linear-gradient(145deg, rgba(19, 37, 54, 0.94), rgba(10, 24, 35, 0.94));
+.about-photo {
+  aspect-ratio: 320 / 428;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  min-height: 205px;
-  padding: 0.9em;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  display: block;
+  height: auto;
+  max-height: 390px;
+  max-width: 290px;
+  object-fit: cover;
+  width: 100%;
 }
-.about-grid span { color: var(--cyan); display: block; font-size: 0.38em; font-weight: 800; letter-spacing: 0.13em; }
-.about-grid strong { display: block; font-size: 0.68em; line-height: 1.2; margin: 0.8em 0 0.45em; }
-.about-grid small { color: var(--muted); display: block; font-size: 0.46em; line-height: 1.4; }
-.profile-links { display: flex; gap: 1.4em; margin-top: 1em; }
-.profile-links a { color: var(--muted); font-size: 0.42em; }
+.about-intro h3 { color: var(--text); font-size: 1.03em; line-height: 1.15; margin: 0 0 0.15em; }
+.about-role { color: var(--cyan); font-size: 0.56em; font-weight: 650; margin: 0.25em 0 0.85em; }
+.about-bio { color: var(--text); font-size: 0.59em; line-height: 1.4; margin: 0.48em 0; }
+.about-personal {
+  border-left: 3px solid var(--cyan);
+  color: var(--muted);
+  font-size: 0.55em;
+  line-height: 1.4;
+  margin: 0.85em 0 0;
+  padding: 0.12em 0 0.12em 0.7em;
+}
+.about-personal strong { color: var(--text); }
+.profile-links { display: flex; gap: 1.4em; margin-top: 0.7em; }
+.profile-links a { color: var(--muted); font-size: 0.48em; }
 
 .problem-grid, .guardrails {
   display: grid;
