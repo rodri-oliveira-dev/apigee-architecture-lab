@@ -40,6 +40,17 @@ checkLocalReferences(slides, outputRoot, "slides.md");
 
 const slideCount = slides ? slides.split(/^---$/m).length : 0;
 if (slideCount !== 14) failures.push(`quantidade de slides esperada: 14; encontrada: ${slideCount}`);
+const separator = index.match(/data-separator="([^"]+)"/)?.[1];
+if (!separator) {
+  failures.push("data-separator não configurado no Reveal.js");
+} else {
+  // O parser Markdown do Reveal.js exige o mesmo padrão configurado no HTML.
+  // Um separador reconhecido por /^---$/m pode não ser interpretado pelo Reveal.js.
+  const renderedSlideCount = slides ? slides.split(new RegExp(separator, "gm")).length : 0;
+  if (renderedSlideCount !== slideCount) {
+    failures.push(`Reveal.js reconhece ${renderedSlideCount} slides, mas o Markdown declara ${slideCount}; verifique as linhas em branco antes de ---`);
+  }
+}
 if ((slides.match(/^Notas?:$/gm) ?? []).length !== slideCount) failures.push("cada slide deve possuir notas do apresentador");
 for (const label of ["Mensagem principal", "Abertura", "Explicação principal", "Arquivos demonstrados", "Transição"]) {
   if ((slides.match(new RegExp(`\\*\\*${label}:\\*\\*`, "g")) ?? []).length !== slideCount) {

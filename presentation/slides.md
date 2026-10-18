@@ -67,6 +67,7 @@ Notas:
 **Arquivos demonstrados:** Nenhum; foto, descrição profissional e interesses foram adaptados do meu portfólio público, disponível no próprio slide.
 
 **Transição:** Para responder à pergunta sobre o problema que o gateway resolve, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
+
 ---
 
 <!-- .slide: data-timing="110" -->
