@@ -41,6 +41,7 @@ Abra <http://127.0.0.1:8000>. Navegue com as setas, pressione `O` para a visão 
 
 ```bash
 npm run validate:mermaid --prefix presentation
+npm run generate:speaker-script --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
@@ -48,6 +49,12 @@ npm run validate --prefix presentation
 O resultado fica em `presentation/dist/`; mantenha a pasta completa e sirva-a por HTTP. Os slides exibem o caminho de cada exemplo e oferecem links para o código correspondente no GitHub. Consulte o [guia específico da apresentação](presentation/README.md) para configuração de branch, porta alternativa e detalhes da geração.
 
 Após alterações chegarem à branch `main`, o workflow `Publish presentation` valida e publica essa mesma distribuição no [GitHub Pages](https://rodri-oliveira-dev.github.io/apigee-architecture-lab/). Também é possível iniciá-lo manualmente pela aba Actions. Pull Requests executam apenas validação e nunca publicam conteúdo.
+
+### VS Code Workspace
+
+Com Node.js 22.13+, npm 10+ e Python 3.11+ instalados, abra [`apigee-architecture-lab.code-workspace`](apigee-architecture-lab.code-workspace) no VS Code. O workspace recomenda extensões para XML, Markdown e Mermaid e oferece tasks para instalar dependências, iniciar ou construir a apresentação, validar bundles e diagramas, executar testes e rodar `Quality: Validate All` em sequência.
+
+A configuração **Presentation: Open in Browser** aguarda a mensagem de prontidão do servidor e abre <http://127.0.0.1:8000>. Se o ambiente não possuir um navegador Chromium compatível com debug, execute a task **Presentation: Start** e abra a URL manualmente. Pressione `S` na apresentação para o Speaker View; o [roteiro de fala](docs/pt-br/speaker-script.md) também pode ser estudado ou impresso sem abrir o Reveal.js.
 
 ## Validação local
 

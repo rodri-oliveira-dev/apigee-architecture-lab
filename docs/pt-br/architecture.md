@@ -15,24 +15,22 @@ flowchart LR
 
 ## Ciclo de uma mensagem
 
-No request, o fluxo atravessa ProxyEndpoint e TargetEndpoint antes do backend. Na resposta, a ordem dos segmentos é invertida. Dentro de um endpoint, Steps de um segmento executam na ordem declarada; um erro com `continueOnError="false"` abandona o pipeline normal.
+No request, o fluxo atravessa ProxyEndpoint e TargetEndpoint antes do backend. Na resposta, a travessia entre endpoints ocorre no sentido inverso: primeiro o TargetEndpoint e depois o ProxyEndpoint. Em cada pipeline de request ou response, porém, a ordem interna permanece `PreFlow → Conditional Flow → PostFlow`. Somente o primeiro Conditional Flow cuja condição for verdadeira executa em cada segmento. Dentro de cada Flow, os Steps executam na ordem declarada; um erro com `continueOnError="false"` abandona o pipeline normal.
 
 ```mermaid
-sequenceDiagram
-    participant App
-    participant PE as ProxyEndpoint
-    participant TE as TargetEndpoint
-    participant API as Backend
-    App->>PE: request
-    PE->>PE: PreFlow → Conditional Flow → PostFlow
-    PE->>TE: RouteRule
-    TE->>TE: PreFlow → Conditional Flow → PostFlow
-    TE->>API: request
-    API-->>TE: response
-    TE->>TE: PostFlow → Conditional Flow → PreFlow
-    TE-->>PE: response
-    PE->>PE: PostFlow → Conditional Flow → PreFlow
-    PE-->>App: response
+flowchart TB
+    subgraph RES[Response]
+        direction RL
+        B2[Backend] --> TS["TargetEndpoint<br/>Pre → Conditional → Post"]
+        TS --> PS["ProxyEndpoint<br/>Pre → Conditional → Post"]
+        PS --> A2[Consumidor]
+    end
+    subgraph REQ[Request]
+        direction LR
+        A[Consumidor] --> PR["ProxyEndpoint<br/>Pre → Conditional → Post"]
+        PR -->|RouteRule| TR["TargetEndpoint<br/>Pre → Conditional → Post"]
+        TR --> B[Backend]
+    end
 ```
 
 ```mermaid
@@ -55,4 +53,4 @@ Policies são configuração, não substitutos automáticos para decisões arqui
 
 Os bundles seguem a estrutura documentada e são verificados por relações que o repositório consegue provar. A plataforma ainda deve validar schemas, disponibilidade de policies/licenças, variáveis em runtime, recursos de organização/environment, conectividade e comportamento distribuído.
 
-Referências: [estrutura de proxies](https://cloud.google.com/apigee/docs/api-platform/fundamentals/structure-api-proxies), [configuração de flows](https://cloud.google.com/apigee/docs/api-platform/reference/flow-configuration-reference) e [variáveis de flow](https://cloud.google.com/apigee/docs/api-platform/fundamentals/introduction-flow-variables).
+Referências: [estrutura de proxies](https://cloud.google.com/apigee/docs/api-platform/fundamentals/structure-api-proxies), [ordem de execução dos flows](https://cloud.google.com/apigee/docs/api-platform/fundamentals/what-are-flows), [configuração de proxies](https://cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference) e [variáveis de flow](https://cloud.google.com/apigee/docs/api-platform/fundamentals/introduction-flow-variables).

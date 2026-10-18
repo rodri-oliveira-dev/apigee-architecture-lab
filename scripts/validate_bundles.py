@@ -24,6 +24,7 @@ REQUIRED_DOCS = (
     "docs/pt-br/architecture.md",
     "docs/pt-br/validation.md",
     "docs/pt-br/presentation-guide.md",
+    "docs/pt-br/speaker-script.md",
     "docs/en/architecture.md",
     "docs/en/validation.md",
     "docs/en/presentation-guide.md",

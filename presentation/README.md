@@ -1,11 +1,12 @@
 # Apresentação técnica — Google Cloud Apigee
 
-Apresentação em português brasileiro, com 12 slides e duração planejada de 25 a 30 minutos. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
+Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
 
 ## Pré-requisitos
 
 - Node.js 22.13 ou mais recente;
 - npm 10 ou mais recente;
+- Python 3.11 ou mais recente para validar os bundles;
 - Chromium baixado automaticamente pela dependência do Mermaid CLI.
 
 ## Executar localmente
@@ -17,7 +18,7 @@ npm ci --prefix presentation
 npm start --prefix presentation
 ```
 
-Abra <http://127.0.0.1:8000>. Use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir as notas do apresentador. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
+Abra <http://127.0.0.1:8000>. Use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir o Speaker View. Permita pop-ups para que a janela de notas seja criada. As notas pertencem a cada slide e não aparecem na tela projetada. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
 
 Uma porta alternativa pode ser informada após `--`:
 
@@ -29,6 +30,7 @@ npm start --prefix presentation -- --port=8080
 
 ```bash
 npm run validate:mermaid --prefix presentation
+npm run generate:speaker-script --prefix presentation
 npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
@@ -69,7 +71,15 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 - links de código são construídos a partir do remote e da referência Git configurados;
 - o resultado final é gravado somente em `dist/`.
 
-`npm run validate:mermaid` renderiza todos os blocos Mermaid encontrados nos arquivos Markdown e informa arquivo, linha e bloco em caso de erro. `npm run validate` confirma a quantidade de slides, notas, trechos XML, arquivos referenciados, SVGs e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
+`npm run validate:mermaid` renderiza todos os blocos Mermaid encontrados nos arquivos Markdown e informa arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
+
+Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium a 1920×1080, detecta overflow e notas visíveis e grava capturas temporárias em `presentation/dist/visual-check/`.
+
+## VS Code Workspace
+
+Abra `apigee-architecture-lab.code-workspace` pelo menu **File > Open Workspace from File**. O workspace recomenda extensões para XML, Markdown e Mermaid e disponibiliza as tasks de instalação, build, servidor, validações individuais e `Quality: Validate All`.
+
+A configuração de execução **Presentation: Open in Browser** inicia a task de servidor, aguarda a mensagem real de prontidão e abre <http://127.0.0.1:8000> em um navegador Chromium compatível com o debugger do VS Code. Se Chrome/Chromium não estiver disponível, execute **Presentation: Start** e abra o endereço manualmente. Interrompa o servidor pelo botão de encerramento da task no terminal.
 
 ## Arquivos principais
 
@@ -77,5 +87,7 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 - `slides.md`: conteúdo e notas do apresentador;
 - `assets/styles/theme.css`: tema escuro e componentes visuais;
 - `scripts/build.mjs`: extração de fontes, diagramas e empacotamento;
+- `scripts/generate-speaker-script.mjs`: geração e verificação do roteiro de fala;
 - `scripts/validate.mjs`: verificação da distribuição estática;
+- `scripts/visual-check.mjs`: inspeção automatizada em navegador a 1920×1080;
 - `scripts/serve.mjs`: servidor HTTP local sem dependência adicional.

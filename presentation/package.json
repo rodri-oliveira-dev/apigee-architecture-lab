@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "npm run build && node scripts/serve.mjs",
-    "build": "node scripts/build.mjs",
-    "validate": "node scripts/validate.mjs",
-    "validate:mermaid": "node scripts/validate-mermaid.mjs"
+    "build": "node scripts/generate-speaker-script.mjs --check && node scripts/build.mjs",
+    "generate:speaker-script": "node scripts/generate-speaker-script.mjs",
+    "validate": "node scripts/generate-speaker-script.mjs --check && node scripts/validate.mjs",
+    "validate:mermaid": "node scripts/validate-mermaid.mjs",
+    "validate:visual": "node scripts/visual-check.mjs"
   },
   "engines": {
     "node": ">=22.13.0"

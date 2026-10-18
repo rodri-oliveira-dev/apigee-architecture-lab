@@ -118,6 +118,25 @@ body,
   text-align: center;
 }
 
+.about-grid {
+  display: grid;
+  gap: 0.7em;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 1.2em;
+}
+.about-grid > div {
+  background: linear-gradient(145deg, rgba(19, 37, 54, 0.94), rgba(10, 24, 35, 0.94));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  min-height: 205px;
+  padding: 0.9em;
+}
+.about-grid span { color: var(--cyan); display: block; font-size: 0.38em; font-weight: 800; letter-spacing: 0.13em; }
+.about-grid strong { display: block; font-size: 0.68em; line-height: 1.2; margin: 0.8em 0 0.45em; }
+.about-grid small { color: var(--muted); display: block; font-size: 0.46em; line-height: 1.4; }
+.profile-links { display: flex; gap: 1.4em; margin-top: 1em; }
+.profile-links a { color: var(--muted); font-size: 0.42em; }
+
 .problem-grid, .guardrails {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -202,6 +221,7 @@ body,
 
 .policy-slide { align-items: start; }
 .policy-slide pre { font-size: 0.4em; }
+.policy-slide + .pipeline { margin-top: 0.5em; }
 .pipeline { align-items: center; display: flex; gap: 0.6em; justify-content: center; margin-top: 0.8em; }
 .pipeline span, .pipeline b { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 0.43em; padding: 0.5em 0.65em; }
 .pipeline b { border-color: rgba(54, 215, 231, 0.55); color: var(--cyan); }
@@ -229,6 +249,14 @@ body,
 .references strong { font-size: 0.52em; }
 .references span, .references a { color: var(--muted); font-size: 0.42em; }
 .references a { color: var(--cyan); }
+
+.questions-slide { text-align: center !important; }
+.questions-content { align-items: center; display: flex; flex-direction: column; }
+.questions-content h2 { font-size: 3.2em; margin: 0.22em 0 0.12em; }
+.questions-content p { color: var(--muted); font-size: 0.72em; margin: 0; }
+.question-link { border-top: 1px solid var(--line); margin-top: 2.2em; padding-top: 0.65em; }
+.question-link a { color: var(--muted); font-size: 0.4em; text-decoration: none; }
+.question-link a:hover { color: var(--cyan); }
 
 @media (max-width: 900px) {
   .reveal { font-size: 26px; }
