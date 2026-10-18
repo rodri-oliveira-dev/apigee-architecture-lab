@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-target-fault" continueOnError="false" enabled="true">
+  <DisplayName>Assign Safe Target Fault</DisplayName>
+  <Set>
+    <Headers><Header name="Content-Type">application/json</Header></Headers>
+    <Payload contentType="application/json">{"error":"bad_gateway","message":"The backend is temporarily unavailable."}</Payload>
+    <StatusCode>502</StatusCode>
+    <ReasonPhrase>Bad Gateway</ReasonPhrase>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

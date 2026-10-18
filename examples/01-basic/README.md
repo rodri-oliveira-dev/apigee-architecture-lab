@@ -20,11 +20,11 @@ sequenceDiagram
     B-->>T: HTTP response
     T->>T: Response PreFlow → Flows → PostFlow
     T-->>P: Response
-    P->>P: Response PostFlow → Flows → PreFlow
+    P->>P: Response PreFlow → Flows → PostFlow
     P-->>C: Response
 ```
 
-**Comportamento esperado:** no Apigee, toda chamada no BasePath é roteada ao `TargetEndpoint default`. A resposta percorre o caminho inverso. Como o host usa `.invalid`, a chamada real termina em erro de resolução até que um backend de laboratório seja configurado.
+**Comportamento esperado:** no Apigee, toda chamada no BasePath é roteada ao `TargetEndpoint default`. No request, os segmentos executam `ProxyEndpoint → TargetEndpoint → backend`; na response, `backend → TargetEndpoint → ProxyEndpoint`. Dentro do request ou da response de cada endpoint, a ordem continua `PreFlow → primeiro Conditional Flow compatível → PostFlow`. Como o host usa `.invalid`, a chamada real termina em erro de resolução até que um backend de laboratório seja configurado.
 
 **Implicações e boas práticas:** preservar o contrato externo permite evoluir o backend; preferir TargetEndpoints nomeados a URLs diretas na RouteRule mantém conexão e políticas de destino encapsuladas. TLS, timeouts, observabilidade e DNS continuam decisões de runtime.
 

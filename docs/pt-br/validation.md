@@ -30,10 +30,10 @@ npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-Ela verifica todos os blocos Mermaid dos arquivos Markdown, a geração dos diagramas usados nos slides, a quantidade de slides e notas, os trechos XML, as referências locais e a integridade dos recursos estáticos empacotados. Erros Mermaid informam arquivo, linha inicial e número do bloco.
+Ela verifica todos os blocos Mermaid dos arquivos Markdown, a geração dos diagramas usados nos slides, a quantidade de slides e notas, os trechos XML, as referências locais e a integridade dos recursos estáticos empacotados. Erros Mermaid informam arquivo, linha inicial e número do bloco. Os testes Python também fixam os contratos educacionais acrescentados: ordem das policies, remoção de `x-api-key`, Quota por consumer key, execução do Conditional Flow e separação entre respostas HTTP do backend e falhas de conectividade.
 
 ## O que não é verificado
 
-O validador não contém o schema privado/completo da plataforma e não prova que o bundle será importado ou implantado. Ele também não valida expressões de condição, compatibilidade de policies com uma organização, recursos externos, valores de variáveis, credenciais, DNS/TLS, produtos/apps ou comportamento de quota distribuída.
+O validador não contém o schema privado/completo da plataforma e não prova que o bundle será importado ou implantado. Ele também não avalia semanticamente expressões de condição, compatibilidade de policies com uma organização, recursos externos, valores de variáveis, credenciais, DNS/TLS, produtos/apps ou comportamento de quota distribuída. Os testes de contrato inspecionam XML; não executam as policies.
 
 Antes de produção, use import/deploy em um environment não produtivo, Debug, testes funcionais e de falha, revisão de segurança e observabilidade. A validação estática é uma barreira rápida para inconsistências verificáveis, não certificação Apigee.

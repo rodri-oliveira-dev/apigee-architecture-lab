@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-list-orders-context" continueOnError="false" enabled="true">
+  <DisplayName>Identify List Orders Operation</DisplayName>
+  <Set>
+    <Headers>
+      <Header name="x-api-operation">list-orders</Header>
+    </Headers>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

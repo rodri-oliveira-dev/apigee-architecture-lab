@@ -4,6 +4,7 @@
   <PreFlow name="PreFlow">
     <Request>
       <Step><Name>verify-jwt</Name></Step>
+      <Step><Name>remove-authorization</Name></Step>
       <Step><Name>call-shared-security</Name></Step>
     </Request>
     <Response/>

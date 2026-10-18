@@ -1,6 +1,6 @@
 # Laboratório de arquitetura Google Cloud Apigee
 
-Laboratório declarativo para uma apresentação técnica sobre API Management com o Google Cloud Apigee. A API fictícia de pedidos evolui de um proxy mínimo para controles de acesso e tráfego e, por fim, JWT, Shared Flows e tratamento uniforme de falhas.
+Laboratório declarativo para uma apresentação técnica sobre API Management com o Google Cloud Apigee. A API fictícia de pedidos evolui de um proxy mínimo para controles de acesso e tráfego e, por fim, JWT, Shared Flows e tratamento de falhas por categoria.
 
 > **Escopo:** bundles XML, documentação, diagramas e validação estática. Não há infraestrutura GCP, backend funcional, credenciais, deploy ou integração externa. Os hosts `example.invalid` são reservados e impedem uso acidental como produção.
 
@@ -23,8 +23,8 @@ No proxy, o `ProxyEndpoint` define a interface voltada ao consumidor e os fluxos
 | Módulo | Foco | Estado executável |
 |---|---|---|
 | [01 — Básico](examples/01-basic/README.md) | API Proxy, endpoints e RouteRule | Bundle estruturalmente válido; backend fictício |
-| [02 — Intermediário](examples/02-intermediate/README.md) | API key, SpikeArrest, Quota, AssignMessage e fluxo condicional | Exige produto/app/chave no Apigee |
-| [03 — Avançado](examples/03-advanced/README.md) | JWT, Shared Flow, FlowCallout e FaultRules | Exige JWKS em variável privada e deploy ordenado |
+| [02 — Intermediário](examples/02-intermediate/README.md) | API key, remoção da credencial, tráfego e fluxo condicional | Exige produto/app/chave no Apigee |
+| [03 — Avançado](examples/03-advanced/README.md) | JWT, Shared Flow e falhas de proxy, target e backend | Exige JWKS em variável privada e deploy ordenado |
 
 Siga a ordem numérica. Compare o `PreFlow` dos módulos para perceber como a cadeia de políticas cresce e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 30 minutos.
 

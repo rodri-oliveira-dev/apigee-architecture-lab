@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="sanitize-backend-error" continueOnError="false" enabled="true">
+  <DisplayName>Sanitize Backend Error</DisplayName>
+  <Set>
+    <Headers><Header name="Content-Type">application/json</Header></Headers>
+    <Payload contentType="application/json">{"error":"backend_error","message":"The backend could not complete the request."}</Payload>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="response"/>
+</AssignMessage>

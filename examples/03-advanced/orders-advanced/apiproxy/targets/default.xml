@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <TargetEndpoint name="default">
   <Description>Fictitious target used only as a bundle-complete placeholder.</Description>
-  <PreFlow name="PreFlow"><Request/><Response/></PreFlow>
+  <PreFlow name="PreFlow">
+    <Request/>
+    <Response>
+      <Step>
+        <Name>sanitize-backend-error</Name>
+        <Condition>response.status.code &gt;= 400</Condition>
+      </Step>
+    </Response>
+  </PreFlow>
   <Flows/>
   <PostFlow name="PostFlow"><Request/><Response/></PostFlow>
   <HTTPTargetConnection>
+    <Properties>
+      <Property name="success.codes">1xx,2xx,3xx,4xx,5xx</Property>
+    </Properties>
     <URL>https://orders-backend.example.invalid/v1</URL>
   </HTTPTargetConnection>
   <DefaultFaultRule name="default-target-fault">
-    <Step><Name>assign-default-fault</Name></Step>
+    <Step><Name>assign-target-fault</Name></Step>
   </DefaultFaultRule>
 </TargetEndpoint>

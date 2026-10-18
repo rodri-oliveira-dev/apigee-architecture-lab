@@ -2,13 +2,13 @@
 
 ## Português
 
-**Problema:** validar tokens assimétricos, centralizar comportamento reutilizável e devolver falhas seguras e previsíveis. O módulo contém dois artefatos independentes: `orders-security-shared/sharedflowbundle/` e o consumidor `orders-advanced/apiproxy/`.
+**Problema:** validar tokens assimétricos, centralizar comportamento reutilizável e distinguir falhas do gateway, indisponibilidade do target e respostas HTTP do backend. O módulo contém dois artefatos independentes: `orders-security-shared/sharedflowbundle/` e o consumidor `orders-advanced/apiproxy/`.
 
-**Arquivos e sequência:** `verify-jwt.xml` verifica RS256, emissor, audience e JWKS obtido de `private.orders.jwks`; `call-shared-security.xml` invoca `orders-security-shared`; o Shared Flow executa `assign-security-context.xml` para propagar o subject validado. `assign-auth-fault.xml` trata qualquer falha de uma policy JWT, identificada pela variável documentada `JWT.failed`; `assign-default-fault.xml` evita expor detalhes nas demais falhas, inclusive erros de conexão tratados pelo `DefaultFaultRule` do TargetEndpoint.
+**Arquivos e sequência:** `verify-jwt.xml` verifica RS256, emissor, audience e JWKS obtido de `private.orders.jwks`; `remove-authorization.xml` retira o bearer token já validado; `call-shared-security.xml` invoca `orders-security-shared`; o Shared Flow executa `assign-security-context.xml` para propagar apenas o subject validado. No ProxyEndpoint, `assign-auth-fault.xml` responde 401 às falhas sinalizadas por `JWT.failed` e `assign-default-fault.xml` mantém um 500 genérico para outras falhas de policy. No TargetEndpoint, `success.codes` aceita 1xx–5xx no pipeline normal, `sanitize-backend-error.xml` substitui o corpo de respostas 4xx/5xx sem alterar o status original e `assign-target-fault.xml` devolve 502 para falhas de conexão sem resposta HTTP do backend.
 
 ```mermaid
 flowchart LR
-    A[orders-advanced PreFlow] --> J[VerifyJWT]
+    A[orders-advanced PreFlow] --> J[VerifyJWT<br/>remover Authorization]
     J --> F[FlowCallout]
     F --> S[orders-security-shared]
     S --> H[AssignMessage<br/>x-authenticated-subject]
@@ -17,19 +17,23 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    R[Executar policy] --> E{Ocorreu erro?}
-    E -->|não| N[Continuar fluxo normal]
-    E -->|sim| X[Sair do pipeline normal]
-    X --> J{Falha JWT conhecida?}
+    P[Policy falha no ProxyEndpoint] --> J{JWT.failed?}
     J -->|sim| A[FaultRule → resposta 401]
-    J -->|não| D[DefaultFaultRule do endpoint da falha → resposta 500]
+    J -->|não| D[DefaultFaultRule → resposta 500]
+    T[Chamada ao target] --> E{Backend respondeu?}
+    E -->|não: conectividade| G[DefaultFaultRule → resposta 502]
+    E -->|sim: 4xx/5xx| H[Preservar status e sanitizar corpo]
     A --> C[Cliente]
     D --> C
+    G --> C
+    H --> C
 ```
 
-**Comportamento e dependências:** os XMLs e referências locais são validáveis. Em runtime, o token é lido por padrão de `Authorization: Bearer ...`, o prefixo é removido pela policy e a variável privada deve conter um documento JWKS confiável; um mecanismo seguro, fora deste repositório, deve preenchê-la. O Shared Flow deve ser importado e implantado no mesmo environment antes do proxy consumidor. Shared Flows não recebem tráfego diretamente.
+**Comportamento e dependências:** os XMLs e referências locais são validáveis. Em runtime, o token é lido por padrão de `Authorization: Bearer ...`, o prefixo é removido para validação pela policy e a variável privada deve conter um documento JWKS confiável; um mecanismo seguro, fora deste repositório, deve preenchê-la. O Shared Flow deve ser importado e implantado no mesmo environment antes do proxy consumidor. Shared Flows não recebem tráfego diretamente.
 
-**Limitações e decisões:** a URL de issuer usa `.invalid` como contrato fictício, não como integração. O laboratório não demonstra obtenção/rotação de chaves, cache, autorização por scopes, logging ou mascaramento. Reutilizar apenas preocupações realmente comuns evita acoplamento; FaultRules pertencem ao endpoint onde a falha pode ocorrer. Mensagens externas são estáveis e não vazam `fault.name` ou detalhes internos.
+`JWT.failed = true` é uma sinalização compartilhada por todas as policies JWT quando ocorre uma falha de runtime; ela não significa somente “assinatura inválida”. Pode cobrir token malformado, expirado, ainda não válido, issuer/audience/claims incompatíveis, chave não correspondente e também falhas de chave/configuração em runtime. O exemplo agrupa essas categorias em 401 para manter o fluxo didático pequeno, seguindo os status documentados pela policy. Em produção, falhas operacionais de JWKS/configuração devem ser separadas e monitoradas para não serem confundidas com erro do consumidor.
+
+**Limitações e decisões:** a URL de issuer usa `.invalid` como contrato fictício, não como integração. O laboratório não demonstra obtenção/rotação de chaves, cache, autorização por scopes, logging ou mascaramento completo de headers. Reutilizar apenas preocupações realmente comuns evita acoplamento; FaultRules pertencem ao endpoint onde a falha pode ocorrer. Respostas do backend preservam o status, mas recebem payload genérico; falhas locais não expõem `fault.name`, URLs ou detalhes internos. A propriedade ampla de `success.codes` existe apenas para demonstrar a distinção entre resposta HTTP e falha de transporte; contratos reais devem definir quais códigos são aceitos e como cada payload é tratado.
 
 ## English
 

@@ -5,7 +5,10 @@
   <Policies>
     <Policy>assign-auth-fault</Policy>
     <Policy>assign-default-fault</Policy>
+    <Policy>assign-target-fault</Policy>
     <Policy>call-shared-security</Policy>
+    <Policy>remove-authorization</Policy>
+    <Policy>sanitize-backend-error</Policy>
     <Policy>verify-jwt</Policy>
   </Policies>
   <ProxyEndpoints><ProxyEndpoint>default</ProxyEndpoint></ProxyEndpoints>
