@@ -42,6 +42,8 @@ sequenceDiagram
 
 **Boas práticas e limites:** `VerifyAPIKey` rejeita uma chave inválida antes de alcançar `SpikeArrest`; este controle não limita essas tentativas no desenho atual. Uma proteção de borda anterior exige outra decisão. Validar antes de remover a credencial e contabilizar a quota; não propagar segredos sem necessidade; dimensionar limites com testes; não usar `messageid` como identificador de negócio. `Distributed` e `Synchronous` dão contagem coordenada, mas a sincronização por chamada pode reduzir throughput e deve ser uma escolha consciente. Uma quota realmente agregada por aplicação exigiria escolher um identificador estável compatível com o domínio e com as recomendações da plataforma; isso fica fora do laboratório. O backend continua deliberadamente ausente.
 
+Para relacionar chave válida/inválida, SpikeArrest e Quota a requisições e códigos HTTP, consulte os [cenários ilustrativos](../../docs/pt-br/http-scenarios.md). Eles não foram executados em runtime.
+
 ## English
 
 **Problem:** block anonymous access, control bursts, cap per-application consumption, and propagate correlation. A Conditional Flow for `GET /` acts as a structural marker: its `Request` and `Response` blocks are empty, so it executes no business behavior. It only shows where operation-specific Steps could be attached.
