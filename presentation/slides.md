@@ -395,36 +395,37 @@ Notas:
 ## Demonstração: siga a evolução
 
 <div class="demo-path">
-  <div><span>01 · 35 s</span><strong>Básico</strong><small>ProxyEndpoint + RouteRule</small></div>
+  <div><span>01 · 35 s</span><strong>Básico</strong><small>BasePath + RouteRule</small></div>
   <i>→</i>
-  <div><span>02 · 55 s</span><strong>Intermediário</strong><small>ordem das policies</small></div>
+  <div><span>02 · 55 s</span><strong>Intermediário</strong><small>chave inválida → 401</small></div>
   <i>→</i>
-  <div><span>03 · 50 s</span><strong>Avançado</strong><small>JWT + Shared Flow</small></div>
+  <div><span>03 · 50 s</span><strong>Avançado</strong><small>JWT 401 · target 502</small></div>
 </div>
 
 ```bash
+python scripts/demo_http_scenarios.py
 python scripts/validate_bundles.py
-python -m unittest discover -s tests -v
 ```
 
 <div class="repo-links">
   {{github:examples/01-basic/README.md|Abrir 01 — Básico}}
   {{github:examples/02-intermediate/README.md|Abrir 02 — Intermediário}}
   {{github:examples/03-advanced/README.md|Abrir 03 — Avançado}}
+  {{github:docs/pt-br/http-scenarios.md|Cenários HTTP}}
 </div>
 
 Notas:
-**Mensagem principal:** O repositório foi organizado para que a evolução arquitetural possa ser comparada e validada sem depender de um ambiente Apigee.
+**Mensagem principal:** O roteiro offline relaciona requisições HTTP, policies e resultados condicionais sem simular o Apigee.
 
-**Abertura:** A demonstração acompanha a evolução do código, sem procurar arquivos durante a fala.
+**Abertura:** Vamos percorrer três requisições hipotéticas e localizar nos XMLs as decisões que influenciam o resultado.
 
-**Explicação principal:** No básico, BasePath e RouteRule. No intermediário, a ordem das policies, a Quota por chave e o Conditional Flow. No avançado, VerifyJWT e FlowCallout. Encerramos com os validadores estáticos mostrados no slide.
+**Explicação principal:** No básico, o BasePath e a RouteRule mostram o caminho até um backend fictício. No intermediário, a chave inválida gera uma falha padrão da VerifyAPIKey; com chave válida, SpikeArrest e Quota passam a controlar o tráfego. No avançado, a FaultRule configura JWT.failed como 401 e a falha de conexão ao target como 502. O demonstrador offline lê essas configurações, sem emitir requisições HTTP.
 
-**Contexto arquitetural:** Passar na validação comprova estrutura e referências locais; não comprova schema completo, credenciais, conectividade, produtos ou runtime Apigee.
+**Contexto arquitetural:** Os resultados dependem do runtime e de recursos externos. Não mostramos HTTP 200 porque o backend é fictício. O código offline não é um emulador Apigee; o validador confirma apenas XML e referências locais.
 
-**Demonstração:** Deixe as telas preparadas. Reserve cerca de 35 s ao básico, 55 s ao intermediário, 50 s ao avançado e 40 s aos comandos, com transições.
+**Demonstração:** Deixe abertos `docs/pt-br/http-scenarios.md` e os ProxyEndpoints. Reserve 35 segundos para BasePath e RouteRule, 55 segundos para a chave inválida e os limites condicionais 429, e 50 segundos para JWT.failed → 401 e falha do target → 502. Nos 40 segundos finais, execute os comandos do slide. O cenário de backend 404 sanitizado fica para perguntas. Não execute `curl` para `.invalid`.
 
-**Arquivos demonstrados:** `examples/01-basic/`, `examples/02-intermediate/`, `examples/03-advanced/`, `scripts/validate_bundles.py` e `tests/`.
+**Arquivos demonstrados:** `docs/pt-br/http-scenarios.md`, `scripts/demo_http_scenarios.py`, `scripts/validate_bundles.py`, `examples/01-basic/`, `examples/02-intermediate/` e `examples/03-advanced/`.
 
 **Transição:** Agora podemos resumir o que aprendemos.
 
