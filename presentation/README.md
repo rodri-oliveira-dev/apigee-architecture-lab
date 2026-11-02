@@ -7,7 +7,8 @@ Apresentação em português brasileiro, com 14 slides e 28 minutos de exposiç�
 - Node.js 22.13 ou mais recente;
 - npm 10 ou mais recente;
 - Python 3.11 ou mais recente para validar os bundles;
-- Chromium baixado automaticamente pela dependência do Mermaid CLI.
+- Chromium baixado automaticamente pela dependência do Mermaid CLI;
+- conexão durante o build para obter a foto pública do portfólio do autor (a distribuição publicada não depende dessa conexão).
 
 ## Executar localmente
 
@@ -18,7 +19,7 @@ npm ci --prefix presentation
 npm start --prefix presentation
 ```
 
-Abra <http://127.0.0.1:8000>. Use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir o Speaker View. Permita pop-ups para que a janela de notas seja criada. As notas pertencem a cada slide e não aparecem na tela projetada. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
+Abra <http://127.0.0.1:8000>. Em celulares (largura inferior a 768 px) o Reveal ativa a navegação por rolagem. Para forçar esse modo em outras telas, adicione `?view=scroll` à URL. Em desktop, use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir o Speaker View. Permita pop-ups para que a janela de notas seja criada. As notas pertencem a cada slide e não aparecem na tela projetada. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
 
 Uma porta alternativa pode ser informada após `--`:
 
@@ -35,7 +36,7 @@ npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Seus recursos são locais, exceto a foto do slide “Sobre mim”, obtida do portfólio público e que requer conexão para ser exibida. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
+O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Os recursos de exibição são locais, incluindo a foto do slide “Sobre mim” e a imagem Open Graph de 1200×630. Durante o build, a foto é obtida de um arquivo WebP público do mesmo autor, validada e copiada para `dist/assets/images/`; isso exige rede **no build**, mas não quando o visitante abre a apresentação. O Open Graph é gerado localmente com Chromium. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
 
 ## Publicação no GitHub Pages
 
@@ -88,7 +89,8 @@ A configuração de execução **Presentation: Open in Browser** inicia a task d
 - `index.html`: inicialização 16:9 do Reveal.js e plugins oficiais;
 - `slides.md`: conteúdo e notas do apresentador;
 - `assets/styles/theme.css`: tema escuro e componentes visuais;
-- `scripts/build.mjs`: extração de fontes, diagramas e empacotamento;
+- `scripts/build.mjs`: extração de fontes, diagramas, foto local e empacotamento;
+- `scripts/generate-social-preview.mjs`: geração da prévia PNG de compartilhamento;
 - `scripts/generate-speaker-script.mjs`: geração e verificação do roteiro de fala;
 - `scripts/validate.mjs`: verificação da distribuição estática;
 - `scripts/visual-check.mjs`: inspeção automatizada no Chromium em quatro resoluções, com relatório e capturas;

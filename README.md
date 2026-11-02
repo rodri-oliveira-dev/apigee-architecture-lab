@@ -32,7 +32,7 @@ A [demonstração de cenários HTTP ilustrativos](docs/pt-br/http-scenarios.md) 
 
 ## Apresentação
 
-A apresentação técnica em português brasileiro usa Reveal.js, Markdown, destaque de XML, diagramas SVG locais e notas do apresentador. Os trechos de código e diagramas são extraídos dos arquivos do laboratório durante o build.
+A apresentação técnica em português brasileiro usa Reveal.js, Markdown, destaque de XML, diagramas SVG locais e notas do apresentador. A leitura em celulares usa rolagem; o build empacota a fotografia pública do autor e gera uma imagem Open Graph exclusiva para a apresentação. Os trechos de código e diagramas são extraídos dos arquivos do laboratório durante o build.
 
 ```bash
 npm ci --prefix presentation

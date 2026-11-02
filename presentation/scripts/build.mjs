@@ -7,6 +7,8 @@ const presentationRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(presentationRoot, "..");
 const outputRoot = join(presentationRoot, "dist");
 const diagramsRoot = join(outputRoot, "assets", "diagrams");
+const imagesRoot = join(outputRoot, "assets", "images");
+const portraitSource = "https://raw.githubusercontent.com/rodri-oliveira-dev/rodri-oliveira-dev.github.io/main/assets/profile/rodrigo-about.webp";
 const revealRoot = join(presentationRoot, "node_modules", "reveal.js");
 
 function readUtf8(path) {
@@ -92,6 +94,7 @@ function extractXml(sourcePath, range, highlights) {
 
 rmSync(outputRoot, { recursive: true, force: true });
 mkdirSync(diagramsRoot, { recursive: true });
+mkdirSync(imagesRoot, { recursive: true });
 mkdirSync(join(outputRoot, "assets", "styles"), { recursive: true });
 mkdirSync(join(outputRoot, "vendor", "reveal"), { recursive: true });
 
@@ -103,6 +106,20 @@ copyFileSync(join(revealRoot, "dist", "plugin", "markdown.js"), join(outputRoot,
 copyFileSync(join(revealRoot, "dist", "plugin", "highlight.js"), join(outputRoot, "vendor", "reveal", "highlight.js"));
 copyFileSync(join(revealRoot, "dist", "plugin", "highlight", "monokai.css"), join(outputRoot, "vendor", "reveal", "monokai.css"));
 copyFileSync(join(revealRoot, "dist", "plugin", "notes.js"), join(outputRoot, "vendor", "reveal", "notes.js"));
+
+// Incorporar a foto pública no pacote: navegador não depende de conexão ao portfólio.
+const response = await fetch(portraitSource, { signal: AbortSignal.timeout(20000) });
+if (!response.ok) throw new Error(`Não foi possível incorporar o retrato: HTTP ${response.status}`);
+const portrait = Buffer.from(await response.arrayBuffer());
+if (portrait.length < 1000 || portrait.length > 3_000_000 ||
+    portrait.toString("ascii", 0, 4) !== "RIFF" ||
+    portrait.toString("ascii", 8, 12) !== "WEBP") {
+  throw new Error("Retrato público inválido: esperado WebP");
+}
+writeFileSync(join(imagesRoot, "rodrigo-about.webp"), portrait);
+execFileSync(process.execPath, [join(presentationRoot, "scripts", "generate-social-preview.mjs"), outputRoot], {
+  stdio: "inherit"
+});
 
 const baseUrl = repositoryUrl();
 const ref = repositoryRef();
