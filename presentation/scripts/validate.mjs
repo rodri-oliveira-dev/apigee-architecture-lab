@@ -35,6 +35,30 @@ const slidesPath = resolve(outputRoot, "slides.md");
 const index = read(indexPath);
 const slides = read(slidesPath);
 const theme = read(resolve(outputRoot, "assets", "styles", "theme.css"));
+const socialPreview = resolve(outputRoot, "assets", "images", "social-preview.png");
+if (!existsSync(socialPreview) || statSync(socialPreview).size < 8000) {
+  failures.push("prévia Open Graph ausente ou muito pequena");
+} else {
+  const image = readFileSync(socialPreview);
+  if (!image.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) ||
+      image.readUInt32BE(16) !== 1200 || image.readUInt32BE(20) !== 630) {
+    failures.push("prévia Open Graph precisa ser PNG 1200×630");
+  }
+}
+const portrait = resolve(outputRoot, "assets", "images", "rodrigo-about.webp");
+if (!existsSync(portrait) || statSync(portrait).size < 1000 ||
+    readFileSync(portrait).toString("ascii", 8, 12) !== "WEBP") {
+  failures.push("retrato WebP local ausente ou inválido");
+}
+for (const tag of ["og:title", "og:description", "og:image", "og:image:alt", "og:image:width", "og:image:height", "twitter:card"]) {
+  if (!index.includes(`name="${tag}"`) && !index.includes(`property="${tag}"`)) {
+    failures.push(`metadado de compartilhamento ausente: ${tag}`);
+  }
+}
+if (!index.includes("scrollActivationWidth: 768")) failures.push("modo scroll mobile ausente");
+if (slides.includes("rodri-oliveira-dev.github.io/assets/profile/")) {
+  failures.push("retrato ainda depende de URL remota no navegador");
+}
 checkLocalReferences(index, outputRoot, "index.html");
 checkLocalReferences(slides, outputRoot, "slides.md");
 

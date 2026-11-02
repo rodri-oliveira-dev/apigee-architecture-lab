@@ -1,13 +1,14 @@
 # Apresentação técnica — Google Cloud Apigee
 
-Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
+Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. O slide 12 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
 
 ## Pré-requisitos
 
 - Node.js 22.13 ou mais recente;
 - npm 10 ou mais recente;
 - Python 3.11 ou mais recente para validar os bundles;
-- Chromium baixado automaticamente pela dependência do Mermaid CLI.
+- Chromium baixado automaticamente pela dependência do Mermaid CLI;
+- conexão durante o build para obter a foto pública do portfólio do autor (a distribuição publicada não depende dessa conexão).
 
 ## Executar localmente
 
@@ -18,7 +19,7 @@ npm ci --prefix presentation
 npm start --prefix presentation
 ```
 
-Abra <http://127.0.0.1:8000>. Use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir o Speaker View. Permita pop-ups para que a janela de notas seja criada. As notas pertencem a cada slide e não aparecem na tela projetada. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
+Abra <http://127.0.0.1:8000>. Em celulares (largura inferior a 768 px) o Reveal ativa a navegação por rolagem. Para forçar esse modo em outras telas, adicione `?view=scroll` à URL. Em desktop, use as setas para navegar, `F` para tela cheia, `O` para visão geral e `S` para abrir o Speaker View. Permita pop-ups para que a janela de notas seja criada. As notas pertencem a cada slide e não aparecem na tela projetada. O servidor HTTP é necessário porque os slides usam um arquivo Markdown externo.
 
 Uma porta alternativa pode ser informada após `--`:
 
@@ -35,7 +36,7 @@ npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Seus recursos são locais, exceto a foto do slide “Sobre mim”, obtida do portfólio público e que requer conexão para ser exibida. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
+O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Os recursos de exibição são locais, incluindo a foto do slide “Sobre mim” e a imagem Open Graph de 1200×630. Durante o build, a foto é obtida de um arquivo WebP público do mesmo autor, validada e copiada para `dist/assets/images/`; isso exige rede **no build**, mas não quando o visitante abre a apresentação. O download usa até três tentativas com espera incremental para timeouts, falhas de rede, HTTP 429 e HTTP 5xx; erros permanentes falham imediatamente. O Open Graph é gerado localmente com Chromium. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
 
 ## Publicação no GitHub Pages
 
@@ -73,7 +74,9 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 
 `npm run validate:mermaid` testa o parser e renderiza todos os blocos Mermaid encontrados nos arquivos Markdown, inclusive cercas com até três espaços de indentação, informando arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
 
-Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium a 1920×1080, detecta overflow e notas visíveis e grava capturas temporárias em `presentation/dist/visual-check/`.
+Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium em **1920×1080, 1366×768, 1280×720 e 1024×768**. O teste verifica a quantidade real de slides renderizados, Speaker View, elementos fora da área do slide, overflow, truncamentos visíveis por CSS, tamanho mínimo do texto principal e auxiliar após a escala do Reveal.js, imagens locais quebradas e notas indevidamente visíveis. Os limites de fonte diferem por resolução e são heurísticas de legibilidade, não uma certificação de acessibilidade.
+
+As capturas ficam em `presentation/dist/visual-check/<largura>x<altura>/` e o relatório estruturado em `presentation/dist/visual-check/report.json`. O job `visual-validation` executa essa verificação em pull requests direcionados à `main` e em pushes na `main` ou em branches `feature/**`. Em caso de falha, publica as capturas e o relatório como artefato do GitHub Actions por sete dias. O teste é orientado a desktop/projeção; a experiência em dispositivos móveis exige revisão específica de layout.
 
 ## VS Code Workspace
 
@@ -86,8 +89,9 @@ A configuração de execução **Presentation: Open in Browser** inicia a task d
 - `index.html`: inicialização 16:9 do Reveal.js e plugins oficiais;
 - `slides.md`: conteúdo e notas do apresentador;
 - `assets/styles/theme.css`: tema escuro e componentes visuais;
-- `scripts/build.mjs`: extração de fontes, diagramas e empacotamento;
+- `scripts/build.mjs`: extração de fontes, diagramas, foto local e empacotamento;
+- `scripts/generate-social-preview.mjs`: geração da prévia PNG de compartilhamento;
 - `scripts/generate-speaker-script.mjs`: geração e verificação do roteiro de fala;
 - `scripts/validate.mjs`: verificação da distribuição estática;
-- `scripts/visual-check.mjs`: inspeção automatizada em navegador a 1920×1080;
+- `scripts/visual-check.mjs`: inspeção automatizada no Chromium em quatro resoluções, com relatório e capturas;
 - `scripts/serve.mjs`: servidor HTTP local sem dependência adicional.

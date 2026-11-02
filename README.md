@@ -28,9 +28,11 @@ No proxy, o `ProxyEndpoint` define a interface voltada ao consumidor e os fluxos
 
 Siga a ordem numérica. Compare o `PreFlow` dos módulos para perceber como a cadeia de políticas cresce e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 30 minutos.
 
+A [demonstração de cenários HTTP ilustrativos](docs/pt-br/http-scenarios.md) relaciona requisições, policies e respostas condicionais. Para apresentar sem Google Cloud, execute `python scripts/demo_http_scenarios.py`: o comando **lê os XMLs**, não envia requisições e não emula o runtime Apigee.
+
 ## Apresentação
 
-A apresentação técnica em português brasileiro usa Reveal.js, Markdown, destaque de XML, diagramas SVG locais e notas do apresentador. Os trechos de código e diagramas são extraídos dos arquivos do laboratório durante o build.
+A apresentação técnica em português brasileiro usa Reveal.js, Markdown, destaque de XML, diagramas SVG locais e notas do apresentador. A leitura em celulares usa rolagem; o build empacota a fotografia pública do autor e gera uma imagem Open Graph exclusiva para a apresentação. Os trechos de código e diagramas são extraídos dos arquivos do laboratório durante o build.
 
 ```bash
 npm ci --prefix presentation

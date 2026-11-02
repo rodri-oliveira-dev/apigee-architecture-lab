@@ -40,7 +40,9 @@ sequenceDiagram
 
 **Comportamento esperado:** após uma chave válida ser verificada, `x-api-key` é removido antes do roteamento, pois o backend não precisa dessa credencial. SpikeArrest protege o proxy contra rajadas com uma janela deslizante regional; Quota governa cada consumer key numa janela móvel. Para `GET /`, o primeiro Conditional Flow compatível executa e adiciona o header técnico `x-api-operation`; outras operações seguem ao PostFlow sem esse Step. SpikeArrest e Quota não são controles equivalentes.
 
-**Boas práticas e limites:** validar antes de remover a credencial e contabilizar a quota; não propagar segredos sem necessidade; dimensionar limites com testes; não usar `messageid` como identificador de negócio. `Distributed` e `Synchronous` dão contagem coordenada, mas a sincronização por chamada pode reduzir throughput e deve ser uma escolha consciente. Uma quota realmente agregada por aplicação exigiria escolher um identificador estável compatível com o domínio e com as recomendações da plataforma; isso fica fora do laboratório. O backend continua deliberadamente ausente.
+**Boas práticas e limites:** `VerifyAPIKey` rejeita uma chave inválida antes de alcançar `SpikeArrest`; este controle não limita essas tentativas no desenho atual. Uma proteção de borda anterior exige outra decisão. Validar antes de remover a credencial e contabilizar a quota; não propagar segredos sem necessidade; dimensionar limites com testes; não usar `messageid` como identificador de negócio. `Distributed` e `Synchronous` dão contagem coordenada, mas a sincronização por chamada pode reduzir throughput e deve ser uma escolha consciente. Uma quota realmente agregada por aplicação exigiria escolher um identificador estável compatível com o domínio e com as recomendações da plataforma; isso fica fora do laboratório. O backend continua deliberadamente ausente.
+
+Para relacionar chave válida/inválida, SpikeArrest e Quota a requisições e códigos HTTP, consulte os [cenários ilustrativos](../../docs/pt-br/http-scenarios.md). Eles não foram executados em runtime.
 
 ## English
 

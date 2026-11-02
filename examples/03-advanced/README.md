@@ -35,6 +35,8 @@ flowchart TD
 
 **Limitações e decisões:** a URL de issuer usa `.invalid` como contrato fictício, não como integração. O laboratório não demonstra obtenção/rotação de chaves, cache, autorização por scopes, logging ou mascaramento completo de headers. Reutilizar apenas preocupações realmente comuns evita acoplamento; FaultRules pertencem ao endpoint onde a falha pode ocorrer. Respostas do backend preservam o status, mas recebem payload genérico; falhas locais não expõem `fault.name`, URLs ou detalhes internos. A propriedade ampla de `success.codes` existe apenas para demonstrar a distinção entre resposta HTTP e falha de transporte; contratos reais devem definir quais códigos são aceitos e como cada payload é tratado.
 
+Os [cenários HTTP ilustrativos](../../docs/pt-br/http-scenarios.md) descrevem os status 401, 502, 404 sanitizado e 500 definidos ou condicionados pelas policies; não são resultados observados em Apigee.
+
 ## English
 
 **Problem:** verify asymmetric tokens, centralize reusable behavior, and return safe, predictable failures. This module has two independent artifacts: a shared-flow bundle and its consuming API proxy.

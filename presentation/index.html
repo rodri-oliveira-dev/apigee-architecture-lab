@@ -3,8 +3,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Apresentação técnica sobre arquitetura de APIs com Google Cloud Apigee" />
-    <title>Google Cloud Apigee — arquitetura em prática</title>
+    <meta name="description" content="Apresentação técnica sobre Google Cloud Apigee: API Gateway, flows, API keys, SpikeArrest, Quota, JWT e governança com exemplos XML." />
+    <meta name="author" content="Rodrigo de Oliveira" />
+    <meta name="theme-color" content="#071019" />
+    <link rel="canonical" href="https://rodri-oliveira-dev.github.io/apigee-architecture-lab/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Apigee Architecture Lab" />
+    <meta property="og:title" content="Google Cloud Apigee | Do proxy à governança aplicada" />
+    <meta property="og:description" content="Apresentação técnica em português sobre arquitetura de APIs com bundles XML, autenticação, controle de tráfego e falhas." />
+    <meta property="og:url" content="https://rodri-oliveira-dev.github.io/apigee-architecture-lab/" />
+    <meta property="og:image" content="https://rodri-oliveira-dev.github.io/apigee-architecture-lab/assets/images/social-preview.png" />
+    <meta property="og:image:alt" content="Google Cloud Apigee: do proxy mínimo à governança aplicada." />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Google Cloud Apigee | Arquitetura de APIs" />
+    <meta name="twitter:description" content="14 slides e exemplos XML de segurança, tráfego e governança no Apigee." />
+    <meta name="twitter:image" content="https://rodri-oliveira-dev.github.io/apigee-architecture-lab/assets/images/social-preview.png" />
+    <title>Google Cloud Apigee — do proxy à governança aplicada</title>
     <link rel="stylesheet" href="vendor/reveal/reveal.css" />
     <link rel="stylesheet" href="vendor/reveal/monokai.css" />
     <link rel="stylesheet" href="assets/styles/theme.css" />
@@ -40,6 +58,12 @@
         center: true,
         transition: "fade",
         backgroundTransition: "fade",
+        transitionSpeed: "fast",
+        view: window.matchMedia("(max-width: 767px)").matches ? "scroll" : "slide",
+        scrollActivationWidth: 768,
+        scrollLayout: "compact",
+        scrollSnap: "proximity",
+        scrollProgress: "auto",
         totalTime: 1680,
         plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
       });

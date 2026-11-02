@@ -196,7 +196,8 @@ body,
   justify-content: center;
   padding: 0.45em 0.7em;
 }
-.diagram-frame img { display: block; margin: 0; max-height: 380px; max-width: 100%; }
+.diagram-frame img { display: block; margin: 0; max-height: 380px; max-width: 100%; width: auto; height: auto; object-fit: contain; }
+.diagram-frame:focus-within { border-color: rgba(54, 215, 231, 0.55); }
 .architecture-diagram img { height: 345px; }
 .flow-diagram img { height: 300px; }
 .legend-row, .flow-notes, .advanced-pills, .closing-points, .repo-links {
@@ -206,6 +207,8 @@ body,
   margin-top: 0.65em;
 }
 .legend-row span, .flow-notes span { color: var(--muted); font-size: 0.48em; }
+.flow-notes { flex-wrap: wrap; row-gap: 0.35em; }
+.flow-notes span { white-space: normal; text-align: center; }
 
 .source-line {
   align-items: center;
@@ -259,7 +262,9 @@ body,
 .demo-path strong { display: block; font-size: 0.58em; }
 .demo-path small { color: var(--muted); display: block; font-size: 0.45em; }
 .demo-path i { color: var(--muted); font-style: normal; }
+.repo-links { flex-wrap: wrap; row-gap: 0.35em; }
 .repo-links a { background: var(--surface); border: 1px solid var(--line); border-radius: 9px; font-size: 0.46em; padding: 0.55em 0.8em; text-decoration: none; }
+.repo-links a:hover { background: var(--surface-2); border-color: var(--cyan); }
 
 .closing-slide h2 { font-size: 1.75em; line-height: 1.12; margin: 0.55em 0; }
 .closing-points { justify-content: flex-start; }
@@ -276,8 +281,17 @@ body,
 .question-link a { color: var(--muted); font-size: 0.4em; text-decoration: none; }
 .question-link a:hover { color: var(--cyan); }
 
+/* A projeção mantém o canvas 16:9; o modo scroll é ativado em telas estreitas. */
 @media (max-width: 900px) {
-  .reveal { font-size: 26px; }
+  .reveal { font-size: 28px; }
+}
+@media (max-width: 767px) {
+  .reveal { font-size: 30px; }
+  .reveal .slides section { padding: 0 0.12rem; }
+  .reveal .slides section .diagram-frame { padding: 0.3em 0.4em; }
+  .reveal .slides section .about-layout { gap: 0.75em; }
+  .reveal .slides section .about-photo { max-height: 320px; }
+  .reveal .slides section .source-line { margin-top: 0.55em; }
 }
 
 @media (prefers-reduced-motion: reduce) {
