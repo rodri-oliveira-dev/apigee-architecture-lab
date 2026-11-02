@@ -52,13 +52,13 @@ Os tempos indicam uma **janela para explicação, demonstração e transição**
 - Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
 - Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
 - Slide 10: priorizar a cadeia JWT → remoção do bearer → FlowCallout; falhas detalhadas ficam nas notas.
-- Slide 12: aproximadamente 35 s básico, 55 s intermediário, 50 s avançado e 40 s validação.
+- Slide 12: aproximadamente 35 s básico, 55 s intermediário, 50 s avançado e 40 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado.
 
 ## Ensaio e Speaker View
 
 Inicie a apresentação e pressione `S`. Cada slide possui notas próprias com mensagem, abertura, explicação, contexto, demonstração, arquivos e transição. O navegador deve permitir pop-ups para abrir o Speaker View. As notas ficam em elementos próprios do Reveal.js e não aparecem na tela projetada.
 
-Use o slide 12 para a demonstração ao vivo. Antes de apresentar, deixe quatro pontos já abertos no editor: `examples/01-basic/apiproxy/proxies/default.xml`; o `PreFlow` e o `list-orders` intermediários; `verify-jwt.xml` ao lado do Shared Flow; e um terminal na raiz. Mostre um ponto por módulo e então execute o validador, sem navegar pelos READMEs durante a demo.
+Use o slide 12 para uma **demonstração offline**, sem afirmar que houve uma chamada real ao gateway. Antes da sessão, deixe abertos o [guia de cenários HTTP](http-scenarios.md), o ProxyEndpoint básico, o PreFlow intermediário e as FaultRules do avançado. No terminal, execute `python scripts/demo_http_scenarios.py` e depois `python scripts/validate_bundles.py`. O primeiro lê XMLs para apresentar resultados **condicionais**; não envia HTTP, não emula Apigee e não prova comportamento do runtime. Não execute `curl` para `.invalid` nem gere tráfego de carga.
 
 ## Referências oficiais
 
