@@ -1,6 +1,6 @@
 # Apresentação técnica — Google Cloud Apigee
 
-Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
+Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. O slide 12 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
 
 ## Pré-requisitos
 
