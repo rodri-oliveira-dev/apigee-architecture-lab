@@ -19,17 +19,14 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
-
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "22.13.1"
           cache: npm
           cache-dependency-path: presentation/package-lock.json
-
       - name: Install Mermaid renderer
         run: npm ci --prefix presentation
-
       - name: Validate all Markdown diagrams
         run: npm run validate:mermaid --prefix presentation
 
@@ -41,33 +38,73 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
-
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-
       - name: Validate bundles and documentation
         run: python scripts/validate_bundles.py
-
       - name: Run validator unit tests
         run: python -m unittest discover -s tests -v
-
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "22.13.1"
           cache: npm
           cache-dependency-path: presentation/package-lock.json
-
       - name: Install presentation dependencies
         run: npm ci --prefix presentation
-
       - name: Build presentation
         env:
           PRESENTATION_GITHUB_REF: ${{ github.head_ref || github.ref_name }}
           PRESENTATION_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
         run: npm run build --prefix presentation
-
       - name: Validate presentation
         run: npm run validate --prefix presentation
+
+  visual-validation:
+    name: Visual presentation (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.13.1"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+      - name: Install presentation dependencies
+        run: npm ci --prefix presentation
+      - name: Build presentation
+        env:
+          PRESENTATION_GITHUB_REF: ${{ github.head_ref || github.ref_name }}
+          PRESENTATION_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: npm run build --prefix presentation
+      - name: Start local presentation server
+        shell: bash
+        run: |
+          node presentation/scripts/serve.mjs > "$RUNNER_TEMP/presentation-server.log" 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/presentation-server.log"
+          exit 1
+      - name: Inspect all slides in Chromium
+        run: npm run validate:visual --prefix presentation
+      - name: Upload screenshots and report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: presentation-visual-check
+          path: |
+            presentation/dist/visual-check/
+            ${{ runner.temp }}/presentation-server.log
+          if-no-files-found: warn
+          retention-days: 7

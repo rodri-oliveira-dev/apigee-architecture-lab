@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer";
@@ -6,75 +6,150 @@ import puppeteer from "puppeteer";
 const presentationRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outputRoot = join(presentationRoot, "dist", "visual-check");
 const url = process.env.PRESENTATION_URL ?? "http://127.0.0.1:8000";
+// Limites em pixels efetivos depois que o Reveal.js escala a tela de 1280x720.
+const viewports = [
+  { width: 1920, height: 1080, primaryMinPx: 15, secondaryMinPx: 12 },
+  { width: 1366, height: 768, primaryMinPx: 12, secondaryMinPx: 10 },
+  { width: 1280, height: 720, primaryMinPx: 11, secondaryMinPx: 10 },
+  { width: 1024, height: 768, primaryMinPx: 10, secondaryMinPx: 8 }
+];
+
 mkdirSync(outputRoot, { recursive: true });
-
-const browser = await puppeteer.launch({ headless: "shell" });
-const page = await browser.newPage();
-await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
-await page.goto(url, { waitUntil: "networkidle0" });
-await page.waitForFunction(() => globalThis.Reveal?.isReady());
-await page.evaluate(() => Reveal.configure({ transition: "none", backgroundTransition: "none" }));
-
-const slideCount = await page.evaluate(() => Reveal.getTotalSlides());
 const failures = [];
-
+const results = [];
+const browser = await puppeteer.launch({ headless: "shell" });
 try {
-  const popupPromise = new Promise((resolvePopup, rejectPopup) => {
-    const timeout = setTimeout(() => rejectPopup(new Error("Speaker View não abriu após pressionar S")), 5000);
-    page.once("popup", (popup) => {
-      clearTimeout(timeout);
-      resolvePopup(popup);
-    });
-  });
-  await page.keyboard.press("s");
-  const speakerView = await popupPromise;
-  await speakerView.waitForSelector(".speaker-controls-notes", { timeout: 5000 });
-  await speakerView.waitForFunction(
-    () => document.querySelector(".speaker-controls-notes")?.textContent.includes("Mensagem principal"),
-    { timeout: 5000 }
-  );
-  await speakerView.close();
-} catch (error) {
-  failures.push(`Speaker View: ${error.message}`);
-}
+  const page = await browser.newPage();
+  page.setDefaultTimeout(15000);
+  await page.setViewport({ width: viewports[0].width, height: viewports[0].height, deviceScaleFactor: 1 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await page.waitForFunction(() => globalThis.Reveal?.isReady());
+  await page.evaluate(() => Reveal.configure({ transition: "none", backgroundTransition: "none" }));
+  const slideCount = await page.evaluate(() => Reveal.getTotalSlides());
+  if (slideCount !== 14) failures.push("Reveal.js renderizou " + slideCount + " slides; esperados: 14");
 
-for (let index = 0; index < slideCount; index += 1) {
-  await page.evaluate((slideIndex) => Reveal.slide(slideIndex), index);
-  await new Promise((resolvePromise) => setTimeout(resolvePromise, 80));
-  const metrics = await page.evaluate(() => {
-    const slide = document.querySelector(".reveal .slides section.present");
-    const notes = [...slide.querySelectorAll("aside.notes")];
-    const slideRect = slide.getBoundingClientRect();
-    const visible = [...slide.querySelectorAll("*")].filter((element) => {
-      const style = getComputedStyle(element);
-      return !element.closest("aside.notes") && style.display !== "none" && style.visibility !== "hidden";
+  // Testa notas uma vez; não devem ser exibidas na projeção.
+  try {
+    const popupPromise = new Promise((resolvePopup, rejectPopup) => {
+      const timeout = setTimeout(() => rejectPopup(new Error("Speaker View não abriu após pressionar S")), 10000);
+      page.once("popup", (popup) => {
+        clearTimeout(timeout);
+        resolvePopup(popup);
+      });
     });
-    const outside = visible.filter((element) => {
-      const rect = element.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && (
-        rect.left < slideRect.left - 2 || rect.right > slideRect.right + 2 ||
-        rect.top < slideRect.top - 2 || rect.bottom > slideRect.bottom + 2
+    await page.keyboard.press("s");
+    const speakerView = await popupPromise;
+    try {
+      await speakerView.waitForSelector(".speaker-controls-notes", { timeout: 10000 });
+      await speakerView.waitForFunction(
+        () => document.querySelector(".speaker-controls-notes")?.textContent.includes("Mensagem principal"),
+        { timeout: 10000 }
       );
-    });
-    return {
-      horizontalOverflow: slide.scrollWidth > slide.clientWidth + 2,
-      verticalOverflow: slide.scrollHeight > slide.clientHeight + 8,
-      dimensions: `${slide.scrollWidth}x${slide.scrollHeight}/${slide.clientWidth}x${slide.clientHeight}`,
-      outside: outside.slice(0, 5).map((element) => element.tagName.toLowerCase() + (element.className ? `.${String(element.className).split(" ").join(".")}` : "")),
-      notesVisible: notes.some((note) => getComputedStyle(note).display !== "none")
-    };
-  });
-  if (metrics.horizontalOverflow || metrics.verticalOverflow || metrics.outside.length || metrics.notesVisible) {
-    failures.push(`slide ${index + 1}: ${JSON.stringify(metrics)}`);
+    } finally {
+      await speakerView.close();
+    }
+  } catch (error) {
+    failures.push("Speaker View: " + error.message);
   }
-  await page.screenshot({ path: join(outputRoot, `slide-${String(index + 1).padStart(2, "0")}.png`) });
-}
 
-await browser.close();
+  for (const viewport of viewports) {
+    const viewportId = viewport.width + "x" + viewport.height;
+    const screenshotDir = join(outputRoot, viewportId);
+    mkdirSync(screenshotDir, { recursive: true });
+    await page.setViewport({ width: viewport.width, height: viewport.height, deviceScaleFactor: 1 });
+    await page.evaluate(() => Reveal.layout());
+
+    for (let index = 0; index < slideCount; index += 1) {
+      await page.evaluate((slideIndex) => Reveal.slide(slideIndex), index);
+      await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      const metrics = await page.evaluate((limits) => {
+        const slide = document.querySelector(".reveal .slides section.present");
+        if (!slide) return { error: "slide ativo não encontrado" };
+        const slideRect = slide.getBoundingClientRect();
+        const scale = Reveal.getScale();
+        const visible = [...slide.querySelectorAll("*")].filter((element) => {
+          const style = getComputedStyle(element);
+          return !element.closest("aside.notes") &&
+            style.display !== "none" && style.visibility !== "hidden" &&
+            Number(style.opacity) > 0;
+        });
+        const outside = visible.filter((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0 &&
+            (rect.left < slideRect.left - 2 || rect.right > slideRect.right + 2 ||
+             rect.top < slideRect.top - 2 || rect.bottom > slideRect.bottom + 2);
+        });
+        const isVisibleText = (element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return !element.closest("aside.notes") && style.display !== "none" &&
+            style.visibility !== "hidden" && Number(style.opacity) > 0 &&
+            rect.width > 0 && rect.height > 0 && element.textContent.trim().length > 0;
+        };
+        const primary = "h1,h2,h3,.about-bio,.about-role,.problem-card strong,.compare-card p,.stack-cards strong,.responsibility-stack strong,.guardrails strong,.takeaway,.questions-content p";
+        const secondary = ".eyebrow,.source-line,.legend-row span,.flow-notes span,.problem-card small,.guardrails small,.responsibility-stack small,.responsibility-stack span,.pipeline span,.pipeline b,.demo-path span,.demo-path small,.repo-links a,.profile-links a,.references span,.references a,.question-link a";
+        const undersized = [];
+        for (const [selector, minimum] of [[primary, limits.primaryMinPx], [secondary, limits.secondaryMinPx]]) {
+          for (const element of slide.querySelectorAll(selector)) {
+            if (!isVisibleText(element)) continue;
+            const actualSize = parseFloat(getComputedStyle(element).fontSize) * scale;
+            if (actualSize + 0.15 < minimum) {
+              undersized.push({
+                element: element.tagName.toLowerCase(),
+                text: element.textContent.trim().replace(/\s+/g, " ").slice(0, 55),
+                px: Number(actualSize.toFixed(1)),
+                minPx: minimum
+              });
+            }
+          }
+        }
+        const clipped = visible.filter((element) => {
+          const style = getComputedStyle(element);
+          return (style.overflowX === "hidden" || style.overflowX === "clip") &&
+            element.scrollWidth > element.clientWidth + 2;
+        });
+        const missingLocalImages = [...slide.querySelectorAll("img")].filter((img) => {
+          const src = new URL(img.src, location.href);
+          return src.origin === location.origin && (!img.complete || img.naturalWidth === 0);
+        });
+        return {
+          scale: Number(scale.toFixed(3)),
+          horizontalOverflow: slide.scrollWidth > slide.clientWidth + 2,
+          verticalOverflow: slide.scrollHeight > slide.clientHeight + 8,
+          outside: outside.slice(0, 5).map((element) => element.tagName.toLowerCase()),
+          clipped: clipped.slice(0, 5).map((element) => element.tagName.toLowerCase()),
+          undersized: undersized.slice(0, 5),
+          missingLocalImages: missingLocalImages.map((img) => img.getAttribute("src")),
+          notesVisible: [...slide.querySelectorAll("aside.notes")].some((note) => getComputedStyle(note).display !== "none")
+        };
+      }, viewport);
+
+      const issues = [
+        metrics.error,
+        metrics.horizontalOverflow && "overflow horizontal",
+        metrics.verticalOverflow && "overflow vertical",
+        metrics.outside?.length && "elementos fora do slide: " + metrics.outside.join(", "),
+        metrics.clipped?.length && "conteúdo truncado: " + metrics.clipped.join(", "),
+        metrics.undersized?.length && "texto pequeno: " + JSON.stringify(metrics.undersized),
+        metrics.missingLocalImages?.length && "imagens locais inválidas: " + metrics.missingLocalImages.join(", "),
+        metrics.notesVisible && "notas visíveis"
+      ].filter(Boolean);
+      results.push({ viewport: viewportId, slide: index + 1, ...metrics, issues });
+      if (issues.length) failures.push(viewportId + " / slide " + (index + 1) + ": " + issues.join("; "));
+      await page.screenshot({ path: join(screenshotDir, "slide-" + String(index + 1).padStart(2, "0") + ".png") });
+    }
+    console.log("Inspeção " + viewportId + ": " + slideCount + " slides verificados.");
+  }
+} finally {
+  await browser.close();
+  writeFileSync(join(outputRoot, "report.json"), JSON.stringify({
+    url, expectedSlides: 14, viewports, failures, results
+  }, null, 2) + "\n");
+}
 
 if (failures.length) {
-  console.error(`Inspeção visual encontrou ${failures.length} problema(s):\n- ${failures.join("\n- ")}`);
-  process.exit(1);
+  console.error("Inspeção visual encontrou " + failures.length + " problema(s):\n- " + failures.join("\n- "));
+  process.exitCode = 1;
+} else {
+  console.log("Inspeção visual aprovada: 14 slides em " + viewports.length + " resoluções, Speaker View, cortes e legibilidade.");
 }
-
-console.log(`Inspeção visual aprovada: ${slideCount} slides em 1920x1080; capturas em presentation/dist/visual-check/.`);

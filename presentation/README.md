@@ -73,7 +73,9 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 
 `npm run validate:mermaid` testa o parser e renderiza todos os blocos Mermaid encontrados nos arquivos Markdown, inclusive cercas com até três espaços de indentação, informando arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
 
-Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium a 1920×1080, detecta overflow e notas visíveis e grava capturas temporárias em `presentation/dist/visual-check/`.
+Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium em **1920×1080, 1366×768, 1280×720 e 1024×768**. O teste verifica a quantidade real de slides renderizados, Speaker View, elementos fora da área do slide, overflow, truncamentos visíveis por CSS, tamanho mínimo do texto principal e auxiliar após a escala do Reveal.js, imagens locais quebradas e notas indevidamente visíveis. Os limites de fonte diferem por resolução e são heurísticas de legibilidade, não uma certificação de acessibilidade.
+
+As capturas ficam em `presentation/dist/visual-check/<largura>x<altura>/` e o relatório estruturado em `presentation/dist/visual-check/report.json`. O job `visual-validation` executa essa verificação em pull requests direcionados à `main` e em pushes na `main`. Em caso de falha, publica as capturas e o relatório como artefato do GitHub Actions por sete dias. O teste é orientado a desktop/projeção; a experiência em dispositivos móveis exige revisão específica de layout.
 
 ## VS Code Workspace
 
@@ -89,5 +91,5 @@ A configuração de execução **Presentation: Open in Browser** inicia a task d
 - `scripts/build.mjs`: extração de fontes, diagramas e empacotamento;
 - `scripts/generate-speaker-script.mjs`: geração e verificação do roteiro de fala;
 - `scripts/validate.mjs`: verificação da distribuição estática;
-- `scripts/visual-check.mjs`: inspeção automatizada em navegador a 1920×1080;
+- `scripts/visual-check.mjs`: inspeção automatizada no Chromium em quatro resoluções, com relatório e capturas;
 - `scripts/serve.mjs`: servidor HTTP local sem dependência adicional.
