@@ -155,20 +155,28 @@ try {
     console.log("Inspeção " + viewportId + ": " + slideCount + " slides verificados.");
   }
 
-  // Em viewport móvel o Reveal.js 6 deve mudar para a leitura por rolagem.
-  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
-  try {
-    await page.waitForFunction(() => Reveal.scrollView?.isActive?.() === true, { timeout: 10000 });
-    const mobile = await page.evaluate(() => ({
-      scrollView: Reveal.scrollView.isActive(),
-      slides: Reveal.getTotalSlides()
-    }));
-    results.push({ viewport: "390x844", mode: "scroll", ...mobile, issues: [] });
-    await page.screenshot({ path: join(outputRoot, "mobile-390x844.png") });
-    console.log("Leitura móvel: modo scroll ativo em 390x844.");
-  } catch (error) {
-    failures.push("390x844: modo scroll não ativado: " + error.message);
+  // Valide um carregamento real em mobile, não somente o resize de um deck desktop.
+  const mobilePage = await browser.newPage();
+  await mobilePage.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+  await mobilePage.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+  await mobilePage.waitForFunction(() => globalThis.Reveal?.isReady());
+  const mobile = await mobilePage.evaluate(() => ({
+    configuredWidth: Reveal.getConfig().scrollActivationWidth,
+    configuredView: Reveal.getConfig().view,
+    scrollView: Reveal.scrollView?.isActive?.() ?? null,
+    slides: Reveal.getTotalSlides(),
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+    classes: document.querySelector(".reveal")?.className
+  }));
+  console.log("Mobile 390x844: " + JSON.stringify(mobile));
+  results.push({ viewport: "390x844", ...mobile, issues: [] });
+  if (mobile.configuredWidth !== 768 || (mobile.scrollView !== true && mobile.configuredView !== "scroll")) {
+    failures.push("390x844: modo de rolagem inativo no carregamento mobile: " + JSON.stringify(mobile));
   }
+  if (mobile.slides !== 14) failures.push("390x844: contagem de slides divergente");
+  await mobilePage.screenshot({ path: join(outputRoot, "mobile-390x844.png") });
+  await mobilePage.close();
 } finally {
   await browser.close();
   writeFileSync(join(outputRoot, "report.json"), JSON.stringify({
