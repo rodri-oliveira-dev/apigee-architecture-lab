@@ -163,7 +163,7 @@ try {
   const mobile = await mobilePage.evaluate(() => ({
     configuredWidth: Reveal.getConfig().scrollActivationWidth,
     configuredView: Reveal.getConfig().view,
-    scrollView: Reveal.scrollView?.isActive?.() ?? null,
+    scrollView: Reveal.isScrollView(),
     slides: Reveal.getTotalSlides(),
     documentWidth: document.documentElement.scrollWidth,
     viewportWidth: window.innerWidth,
