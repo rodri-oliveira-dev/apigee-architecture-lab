@@ -154,6 +154,21 @@ try {
     }
     console.log("Inspeção " + viewportId + ": " + slideCount + " slides verificados.");
   }
+
+  // Em viewport móvel o Reveal.js 6 deve mudar para a leitura por rolagem.
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+  try {
+    await page.waitForFunction(() => Reveal.scrollView?.isActive?.() === true, { timeout: 10000 });
+    const mobile = await page.evaluate(() => ({
+      scrollView: Reveal.scrollView.isActive(),
+      slides: Reveal.getTotalSlides()
+    }));
+    results.push({ viewport: "390x844", mode: "scroll", ...mobile, issues: [] });
+    await page.screenshot({ path: join(outputRoot, "mobile-390x844.png") });
+    console.log("Leitura móvel: modo scroll ativo em 390x844.");
+  } catch (error) {
+    failures.push("390x844: modo scroll não ativado: " + error.message);
+  }
 } finally {
   await browser.close();
   writeFileSync(join(outputRoot, "report.json"), JSON.stringify({
