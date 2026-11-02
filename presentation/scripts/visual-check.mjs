@@ -62,6 +62,15 @@ try {
     for (let index = 0; index < slideCount; index += 1) {
       await page.evaluate((slideIndex) => Reveal.slide(slideIndex), index);
       await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+      // Aguarda imagens locais para não sinalizar falsos erros de carregamento.
+      await page.evaluate(async () => {
+        const active = document.querySelector(".reveal .slides section.present");
+        const images = [...active.querySelectorAll("img")].filter((img) => {
+          const src = new URL(img.src, location.href);
+          return src.origin === location.origin;
+        });
+        await Promise.all(images.map((img) => img.decode().catch(() => {})));
+      });
       const metrics = await page.evaluate((limits) => {
         const slide = document.querySelector(".reveal .slides section.present");
         if (!slide) return { error: "slide ativo não encontrado" };

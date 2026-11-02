@@ -75,7 +75,7 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 
 Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium em **1920×1080, 1366×768, 1280×720 e 1024×768**. O teste verifica a quantidade real de slides renderizados, Speaker View, elementos fora da área do slide, overflow, truncamentos visíveis por CSS, tamanho mínimo do texto principal e auxiliar após a escala do Reveal.js, imagens locais quebradas e notas indevidamente visíveis. Os limites de fonte diferem por resolução e são heurísticas de legibilidade, não uma certificação de acessibilidade.
 
-As capturas ficam em `presentation/dist/visual-check/<largura>x<altura>/` e o relatório estruturado em `presentation/dist/visual-check/report.json`. O job `visual-validation` executa essa verificação em pull requests direcionados à `main` e em pushes na `main`. Em caso de falha, publica as capturas e o relatório como artefato do GitHub Actions por sete dias. O teste é orientado a desktop/projeção; a experiência em dispositivos móveis exige revisão específica de layout.
+As capturas ficam em `presentation/dist/visual-check/<largura>x<altura>/` e o relatório estruturado em `presentation/dist/visual-check/report.json`. O job `visual-validation` executa essa verificação em pull requests direcionados à `main` e em pushes na `main` ou em branches `feature/**`. Em caso de falha, publica as capturas e o relatório como artefato do GitHub Actions por sete dias. O teste é orientado a desktop/projeção; a experiência em dispositivos móveis exige revisão específica de layout.
 
 ## VS Code Workspace
 
