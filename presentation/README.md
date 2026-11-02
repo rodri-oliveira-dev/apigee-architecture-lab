@@ -36,7 +36,7 @@ npm run build --prefix presentation
 npm run validate --prefix presentation
 ```
 
-O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Os recursos de exibição são locais, incluindo a foto do slide “Sobre mim” e a imagem Open Graph de 1200×630. Durante o build, a foto é obtida de um arquivo WebP público do mesmo autor, validada e copiada para `dist/assets/images/`; isso exige rede **no build**, mas não quando o visitante abre a apresentação. O Open Graph é gerado localmente com Chromium. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
+O build gera `presentation/dist/`, uma pasta estática para servir por HTTP. Os recursos de exibição são locais, incluindo a foto do slide “Sobre mim” e a imagem Open Graph de 1200×630. Durante o build, a foto é obtida de um arquivo WebP público do mesmo autor, validada e copiada para `dist/assets/images/`; isso exige rede **no build**, mas não quando o visitante abre a apresentação. O download usa até três tentativas com espera incremental para timeouts, falhas de rede, HTTP 429 e HTTP 5xx; erros permanentes falham imediatamente. O Open Graph é gerado localmente com Chromium. O diretório não é versionado. Ele contém Reveal.js, plugins, estilos, Markdown final e SVGs locais. Para distribuição, compacte a pasta `dist/` completa; abrir apenas `index.html` diretamente via `file://` não suporta Markdown externo nem notas de forma confiável.
 
 ## Publicação no GitHub Pages
 

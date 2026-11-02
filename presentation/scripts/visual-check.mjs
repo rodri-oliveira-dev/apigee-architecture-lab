@@ -170,11 +170,18 @@ try {
     classes: document.querySelector(".reveal")?.className
   }));
   console.log("Mobile 390x844: " + JSON.stringify(mobile));
-  results.push({ viewport: "390x844", ...mobile, issues: [] });
-  if (mobile.configuredWidth !== 768 || (mobile.scrollView !== true && mobile.configuredView !== "scroll")) {
-    failures.push("390x844: modo de rolagem inativo no carregamento mobile: " + JSON.stringify(mobile));
+  const mobileIssues = [];
+  if (mobile.configuredWidth !== 768 || mobile.scrollView !== true) {
+    mobileIssues.push("modo de rolagem inativo");
   }
-  if (mobile.slides !== 14) failures.push("390x844: contagem de slides divergente");
+  if (mobile.documentWidth > mobile.viewportWidth + 1) {
+    mobileIssues.push("overflow horizontal no documento");
+  }
+  if (mobile.slides !== 14) mobileIssues.push("contagem de slides divergente");
+  results.push({ viewport: "390x844", ...mobile, issues: mobileIssues });
+  if (mobileIssues.length) {
+    failures.push("390x844: " + mobileIssues.join("; ") + " " + JSON.stringify(mobile));
+  }
   await mobilePage.screenshot({ path: join(outputRoot, "mobile-390x844.png") });
   await mobilePage.close();
 } finally {

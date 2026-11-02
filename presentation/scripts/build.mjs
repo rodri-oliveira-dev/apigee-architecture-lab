@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchPortraitWithRetry } from "./fetch-portrait.mjs";
 
 const presentationRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(presentationRoot, "..");
@@ -108,8 +109,7 @@ copyFileSync(join(revealRoot, "dist", "plugin", "highlight", "monokai.css"), joi
 copyFileSync(join(revealRoot, "dist", "plugin", "notes.js"), join(outputRoot, "vendor", "reveal", "notes.js"));
 
 // Incorporar a foto pública no pacote: navegador não depende de conexão ao portfólio.
-const response = await fetch(portraitSource, { signal: AbortSignal.timeout(20000) });
-if (!response.ok) throw new Error(`Não foi possível incorporar o retrato: HTTP ${response.status}`);
+const response = await fetchPortraitWithRetry(portraitSource);
 const portrait = Buffer.from(await response.arrayBuffer());
 if (portrait.length < 1000 || portrait.length > 3_000_000 ||
     portrait.toString("ascii", 0, 4) !== "RIFF" ||
