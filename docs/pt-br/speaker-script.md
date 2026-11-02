@@ -30,15 +30,15 @@ A proposta é aproximar duas perspectivas: para quem desenvolve, onde cada polic
 
 **Fala sugerida:**
 
-Eu sou o Rodrigo de Oliveira, arquiteto de software, e trabalho há mais de 20 anos com o desenvolvimento e a evolução de sistemas corporativos.
+Sou Rodrigo de Oliveira, arquiteto de software, com mais de 20 anos de experiência em sistemas corporativos.
 
-Minha trajetória passa por .NET, automação, aplicações backend, integrações e sistemas distribuídos. Hoje participo do desenho e revisão de soluções, da definição de padrões técnicos e do acompanhamento da implementação com os times de engenharia. Esse olhar para as fronteiras entre sistemas é a origem do recorte prático desta apresentação.
+Minha trajetória passa por .NET, backend, integrações e sistemas distribuídos. Hoje trabalho com desenho de soluções, revisão técnica e padrões de engenharia. É desse ponto de vista que proponho olhar para o Apigee: uma fronteira entre sistemas, não apenas um produto.
 
-Fora do código, sou estudante de Filosofia e gosto de leitura, café, jogos retrô e de estar com minha família e meus gatos. Acredito que boas perguntas importam tanto quanto boas respostas. Isso também vale para arquitetura: antes de escolher uma ferramenta, é preciso entender o problema que ela resolve.
+Fora do trabalho, gosto de filosofia, leitura, jogos retrô e de estar com minha família e meus gatos.
 
 **Arquivos demonstrados:** Nenhum; foto, descrição profissional e interesses foram adaptados do meu portfólio público, disponível no próprio slide.
 
-**Transição:** Para responder à pergunta sobre o problema que o gateway resolve, vamos começar pelo que acontece quando uma API cresce e deixa de ser apenas uma URL.
+**Transição:** Agora, por que essa fronteira precisa ser administrada?
 
 ## 3. APIs crescem. A complexidade também.
 
@@ -140,61 +140,61 @@ O trecho na tela é extraído de `examples/01-basic/apiproxy/proxies/default.xml
 
 **Tempo estimado:** 3 min
 
-**Mensagem principal:** A resposta inverte a passagem entre endpoints, mas nunca inverte a ordem interna PreFlow, Conditional Flow e PostFlow.
+**Mensagem principal:** A resposta percorre os endpoints em ordem inversa, mas a execução interna continua PreFlow, primeiro Conditional Flow compatível e PostFlow.
 
 **Fala sugerida:**
 
-Este é o detalhe de execução mais importante da sessão, porque duas ordens diferentes precisam ser lidas ao mesmo tempo.
+Leia o diagrama em duas camadas: entre os endpoints e dentro de cada endpoint.
 
-Na ida, a mensagem percorre o ProxyEndpoint e depois o TargetEndpoint. Na volta, ela entra primeiro no pipeline de response do TargetEndpoint e só então no response do ProxyEndpoint. Dentro de qualquer um desses pipelines, tanto no request quanto no response, a ordem é sempre PreFlow, o primeiro Conditional Flow compatível e PostFlow. Dentro de cada Flow, os Steps executam na ordem declarada.
+No request, o ProxyEndpoint executa antes do TargetEndpoint. No response, a ordem entre eles se inverte. Dentro de cada pipeline, em qualquer sentido, a sequência continua PreFlow, primeiro Conditional Flow compatível e PostFlow. Cada flow executa seus Steps na ordem declarada.
 
-A posição determina qual mensagem e qual contexto uma policy enxerga. Confundir a inversão entre endpoints com a ordem interna pode colocar transformação, logging ou tratamento no ponto errado.
+A posição determina quais variáveis estão disponíveis. Não devemos inverter a ordem interna na resposta; e uma falha que interrompe a execução normal segue para tratamento de erros, não para os próximos Steps.
 
-Abra `docs/pt-br/architecture.md` e siga as setas do segundo Mermaid. Depois abra `examples/02-intermediate/apiproxy/proxies/default.xml`: o flow `list-orders` casa com `GET /` e executa somente a policy declarativa que adiciona `x-api-operation`. Ele demonstra a posição do Conditional Flow sem levar regra de negócio ao gateway.
+Siga as setas em `docs/pt-br/architecture.md`. Depois mostre `list-orders` no proxy intermediário: o Conditional Flow de `GET /` apenas adiciona `x-api-operation`, sem lógica de negócio.
 
 **Arquivos demonstrados:** `docs/pt-br/architecture.md` e `examples/02-intermediate/apiproxy/proxies/default.xml`.
 
-**Transição:** Com a ordem correta, podemos analisar por que a cadeia de segurança e tráfego foi declarada exatamente nessa sequência.
+**Transição:** Com isso em mente, vamos analisar a sequência das policies.
 
 ## 9. Autenticar, minimizar e contabilizar
 
 **Tempo estimado:** 3 min
 
-**Mensagem principal:** A ordem das policies valida a credencial, reduz sua exposição e só então aplica os controles que dependem do contexto verificado.
+**Mensagem principal:** SpikeArrest limita rajadas; Quota controla consumo por credencial. A ordem das policies define quais chamadas chegam a cada controle.
 
 **Fala sugerida:**
 
-No módulo intermediário, a sequência não é estética; uma policy produz o contexto que a seguinte consome.
+SpikeArrest e Quota resolvem problemas diferentes. E a ordem das policies importa.
 
-`VerifyAPIKey` lê `x-api-key`, valida a credencial emitida para uma aplicação e produz metadados. Aqui, `client_id` é a própria consumer key, não o ID lógico da aplicação. Eu removo o header logo depois da validação; as variáveis verificadas continuam disponíveis. `SpikeArrest` controla rajadas para o proxy, a Quota limita cada chave a cem chamadas por minuto e a última policy adiciona correlação.
+`VerifyAPIKey` valida `x-api-key` e disponibiliza variáveis da chave. Removemos o header antes do roteamento. Depois, `SpikeArrest` limita rajadas do proxy a `10ps` em janela deslizante regional; `Quota` permite 100 chamadas por minuto para cada consumer key, em janela móvel. Por último, adicionamos correlação.
 
-API key depende de API product, developer app e chave no plano de gestão. Duas chaves da mesma app — inclusive durante rotação — acumulam quotas separadas neste desenho. Os números são didáticos e precisam de testes de capacidade e contrato de produto antes de qualquer uso real.
+Aqui, `client_id` contém a própria chave, não o identificador lógico da aplicação: duas chaves têm contadores distintos. Como a verificação vem antes do SpikeArrest, chaves inválidas falham antes de alcançar essa policy. Portanto, ela não limita essas tentativas neste desenho. Proteger a borda antes da verificação exigiria outro controle. Os números são didáticos.
 
-Abra o `PreFlow` em `examples/02-intermediate/apiproxy/proxies/default.xml` e percorra os cinco Steps. Mostre `remove-api-key.xml`, compare o `Identifier` de `quota.xml` e finalize no Conditional Flow, que acrescenta apenas `x-api-operation: list-orders` em `GET /`.
+Mostre o PreFlow intermediário, a taxa em `spike-arrest.xml` e o `Identifier` em `quota.xml`. Compare proteção contra rajadas com governança de consumo; a seguir, aponte o Conditional Flow `list-orders`.
 
 **Arquivos demonstrados:** `examples/02-intermediate/apiproxy/proxies/default.xml`, `verify-api-key.xml`, `remove-api-key.xml`, `quota.xml` e `assign-list-orders-context.xml`.
 
-**Transição:** No módulo avançado, a mesma ideia de cadeia passa a combinar identidade assinada, reuso e um contrato explícito de falhas.
+**Transição:** No avançado, acrescentamos identidade assinada e reuso.
 
 ## 10. Confiança, reuso e falhas explícitas
 
 **Tempo estimado:** 3 min
 
-**Mensagem principal:** O fluxo avançado separa três responsabilidades: validar confiança, reutilizar contexto e responder conforme a origem da falha.
+**Mensagem principal:** O caminho principal valida o JWT, remove o bearer token e reutiliza apenas o contexto necessário; falhas exigem tratamento específico.
 
 **Fala sugerida:**
 
-O módulo avançado troca a identidade de aplicação por um token assinado e acrescenta duas preocupações: compartilhar comportamento e responder com segurança quando algo falha.
+No avançado, o foco é a cadeia de confiança e o que enviamos ao backend.
 
-`VerifyJWT` valida RS256 usando o JWKS de `private.orders.jwks`, exige os claims declarados e compara issuer e audience. Depois da validação, o header `Authorization` é removido. O `FlowCallout` chama `orders-security-shared`, que copia somente o subject validado para o request do target. No erro, eu separo categorias: `JWT.failed` leva a 401, outra falha local do proxy usa 500, falta de resposta do target usa 502 e uma resposta 4xx/5xx do backend mantém o status com corpo neutro.
+`VerifyJWT` verifica RS256, issuer, audience e os claims exigidos usando o JWKS em `private.orders.jwks`. Depois retiramos `Authorization`. O `FlowCallout` invoca `orders-security-shared`, que propaga apenas o subject validado.
 
-`JWT.failed` cobre todas as falhas de runtime de policies JWT, inclusive categorias ligadas a chave ou configuração; não é sinônimo apenas de assinatura inválida. O agrupamento em 401 mantém o exemplo pequeno, mas produção deve monitorar e separar falhas operacionais. O Shared Flow precisa estar implantado antes do proxy no mesmo environment.
+`JWT.failed` pode indicar erro do token ou problema operacional de chave/configuração. Este exemplo simplifica tudo em 401; produção precisa distinguir e monitorar falhas de JWKS. Outras falhas locais do proxy usam 500; falhas de conexão ao target, 502; respostas HTTP 4xx/5xx do backend preservam o status e recebem corpo sanitizado. O Shared Flow precisa estar implantado primeiro no mesmo environment.
 
-Mostre somente a cadeia `verify-jwt → remove-authorization → call-shared-security` no PreFlow e o único Step do Shared Flow. Deixe a matriz de falhas nas notas; se perguntarem, abra `targets/default.xml` para mostrar `success.codes`, sanitização do payload e o fallback 502.
+Mostre `verify-jwt → remove-authorization → call-shared-security`. Deixe a matriz de falhas nas notas e abra `targets/default.xml` somente se surgir dúvida.
 
 **Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml`, `verify-jwt.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
 
-**Transição:** Esses exemplos técnicos podem ser resumidos em poucos guardrails para orientar decisões maiores de arquitetura.
+**Transição:** Essas escolhas nos levam aos guardrails de arquitetura.
 
 ## 11. Guardrails arquiteturais
 
@@ -204,17 +204,17 @@ Mostre somente a cadeia `verify-jwt → remove-authorization → call-shared-sec
 
 **Fala sugerida:**
 
-Se eu tivesse de levar somente quatro critérios deste laboratório para uma revisão arquitetural, seriam estes.
+Quatro critérios ajudam a revisar esta integração.
 
-Segurança crítica interrompe o pipeline normal. ProxyEndpoint e TargetEndpoint mantêm contratos distintos. Shared Flow deve reutilizar apenas o que é realmente comum, porque também cria uma dependência de rollout. E a automação precisa declarar honestamente seu alcance.
+Policies de segurança devem interromper a execução normal ao falhar. Interface pública e conexão com o target têm responsabilidades diferentes. Shared Flow reduz duplicação, mas cria dependência de implantação. E os testes precisam declarar claramente o que conseguem validar.
 
-O valor desses guardrails está na manutenção: eles reduzem acoplamento e variação acidental sem transformar uma escolha local em regra universal. Produção ainda exige threat modeling, capacidade, observabilidade, versionamento e estratégia de recuperação.
+Esses critérios ajudam a revisar decisões, não substituem threat modeling, capacidade, observabilidade ou uma estratégia de recuperação.
 
-Abra `docs/pt-br/architectural-decisions.md` e relacione cada decisão aos XMLs vistos. Destaque também `docs/pt-br/validation.md`: XML bem formado e referências corretas não provam importação, deploy ou comportamento distribuído.
+Relacione os critérios com `docs/pt-br/architectural-decisions.md` e os limites com `docs/pt-br/validation.md`.
 
 **Arquivos demonstrados:** `docs/pt-br/architectural-decisions.md` e `docs/pt-br/validation.md`.
 
-**Transição:** Vamos fechar o percurso navegando pelos três módulos e executando exatamente o que o repositório consegue validar.
+**Transição:** Vamos encerrar com uma trilha curta pelos três módulos.
 
 ## 12. Demonstração: siga a evolução
 
@@ -224,17 +224,17 @@ Abra `docs/pt-br/architectural-decisions.md` e relacione cada decisão aos XMLs 
 
 **Fala sugerida:**
 
-Na demonstração, eu sigo sempre a mesma trilha para não transformar a navegação em uma caça a arquivos.
+A demonstração acompanha a evolução do código, sem procurar arquivos durante a fala.
 
-Primeiro mostro no ProxyEndpoint básico onde ficam PreFlow, PostFlow e RouteRule. Depois percorro a sequência intermediária, destacando remoção da chave, Quota por credencial e o Step do Conditional Flow. No avançado, mostro `VerifyJWT`, `FlowCallout` e o único Step compartilhado. Reservo os quarenta segundos finais para o validador e os testes.
+No básico, BasePath e RouteRule. No intermediário, a ordem das policies, a Quota por chave e o Conditional Flow. No avançado, VerifyJWT e FlowCallout. Encerramos com os validadores estáticos mostrados no slide.
 
-A saída prova estrutura XML, nomes, Steps, RouteRules, FlowCallouts e documentação obrigatória. Ela não valida expressions, schemas internos, produtos, credenciais, DNS, TLS, importação, deploy nem comportamento de runtime.
+Passar na validação comprova estrutura e referências locais; não comprova schema completo, credenciais, conectividade, produtos ou runtime Apigee.
 
-Antes da sessão, deixe os quatro pontos já abertos e o terminal na raiz. Siga os tempos exibidos sem abrir READMEs. Execute os dois comandos da tela nos quarenta segundos finais; as validações completas da apresentação ficam preparadas previamente e documentadas no repositório.
+Deixe as telas preparadas. Reserve cerca de 35 s ao básico, 55 s ao intermediário, 50 s ao avançado e 40 s aos comandos, com transições.
 
 **Arquivos demonstrados:** `examples/01-basic/`, `examples/02-intermediate/`, `examples/03-advanced/`, `scripts/validate_bundles.py` e `tests/`.
 
-**Transição:** Depois de percorrer código e validações, podemos resumir o que realmente torna essa fronteira sustentável.
+**Transição:** Agora podemos resumir o que aprendemos.
 
 ## 13. Uma API bem gerenciada torna decisões explícitas.
 
@@ -244,15 +244,15 @@ Antes da sessão, deixe os quatro pontos já abertos e o terminal na raiz. Siga 
 
 **Fala sugerida:**
 
-Para concluir, eu resumiria a sessão em uma ideia: uma API bem gerenciada deixa as decisões importantes visíveis.
+Uma API bem gerenciada deixa decisões importantes visíveis.
 
-Vimos a separação entre interface e destino, a ordem real dos flows, as dependências entre policies e os cuidados com JWT, Shared Flows e falhas. Também vimos que o laboratório é uma ferramenta educacional e estática, não uma certificação de produção.
+Vimos a fronteira entre interface e destino, a ordem dos flows e como segurança, limites e reuso aparecem em XMLs versionáveis. O laboratório demonstra configuração declarativa, não garante comportamento produtivo.
 
-O próximo passo responsável seria validar os bundles em um environment não produtivo, testar sucessos e falhas, observar capacidade e fechar as lacunas operacionais de chaves, logs e rollout.
+Em uma implantação real, o próximo passo seria testar sucessos e falhas num ambiente de teste, medir limites e definir operação de chaves, logs e rollout.
 
 **Arquivos demonstrados:** `README.md`, `docs/pt-br/` e `examples/`.
 
-**Transição:** Com a exposição encerrada, vamos abrir a conversa para perguntas.
+**Transição:** Obrigado! Vamos às perguntas.
 
 ## 14. Perguntas?
 

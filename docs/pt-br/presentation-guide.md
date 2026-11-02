@@ -24,7 +24,7 @@ Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e
 | 6 | Anatomia do API Proxy | 2 min 10 s |
 | 7 | XMLs se conectam por nome | 2 min 10 s |
 | 8 | O ciclo de execução dos Flows | 3 min |
-| 9 | Autenticar antes de contabilizar | 3 min |
+| 9 | Autenticar, minimizar e contabilizar | 3 min |
 | 10 | Confiança, reuso e falhas explícitas | 3 min |
 | 11 | Guardrails arquiteturais | 2 min |
 | 12 | Demonstração: siga a evolução | 3 min |
@@ -37,12 +37,22 @@ Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e
 - Dentro de cada pipeline de request ou response, a ordem é sempre `PreFlow → Conditional Flow → PostFlow`.
 - O `list-orders` intermediário executa somente uma `AssignMessage` que adiciona `x-api-operation`; não implementa lógica de negócio.
 - A API key é a credencial da aplicação. `client_id` contém a consumer key, enquanto os metadados de aplicação ficam em variáveis próprias; autenticação do usuário exige outro mecanismo.
-- Com `UseEffectiveCount=true`, o SpikeArrest do laboratório usa janela deslizante regional para o proxy; a Quota usa a consumer key validada e uma janela móvel por credencial.
-- `x-api-key` é removido após a validação e não chega ao backend.
+- Com `UseEffectiveCount=true`, SpikeArrest limita rajadas do proxy a `10ps` com janela deslizante regional; Quota limita consumo a 100/min por consumer key em janela móvel.
+- `x-api-key` é removido após a validação e não chega ao backend. Como o SpikeArrest está depois de VerifyAPIKey, chaves inválidas são rejeitadas antes de alcançar essa policy; proteção antecipada exige outro desenho.
 - O JWT é validado antes da remoção do header `Authorization`; o backend recebe somente o subject necessário ao exemplo.
 - O proxy avançado depende de JWKS privado e do Shared Flow implantado antes, no mesmo environment.
-- FaultRules são específicas ao endpoint da falha. O exemplo separa JWT (401), falha interna do proxy (500), conectividade com target (502) e resposta HTTP do backend (status preservado, corpo sanitizado).
+- FaultRules pertencem ao endpoint da falha. O laboratório agrupa `JWT.failed` em 401, inclusive erros operacionais que requerem monitoramento separado em produção; proxy 500, conectividade 502 e backend com status preservado e corpo sanitizado.
 - Validação estática não substitui importação, deploy, Debug e testes de runtime no Apigee.
+
+## Ritmo sugerido
+
+Os tempos indicam uma **janela para explicação, demonstração e transição**, não uma meta de palavras. Nas notas, **Abertura** e **Explicação principal** formam a fala essencial. **Contexto arquitetural** é material de aprofundamento seletivo; **Demonstração** orienta a navegação e não precisa ser lida integralmente.
+
+- Slide 2: apresentação pessoal breve, em 1 minuto, sem ler toda a biografia.
+- Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
+- Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
+- Slide 10: priorizar a cadeia JWT → remoção do bearer → FlowCallout; falhas detalhadas ficam nas notas.
+- Slide 12: aproximadamente 35 s básico, 55 s intermediário, 50 s avançado e 40 s validação.
 
 ## Ensaio e Speaker View
 
@@ -56,3 +66,5 @@ Use o slide 12 para a demonstração ao vivo. Antes de apresentar, deixe quatro 
 - [Configuração de API Proxy](https://cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference)
 - [Shared Flows](https://cloud.google.com/apigee/docs/api-platform/fundamentals/shared-flows)
 - [Tratamento de falhas](https://cloud.google.com/apigee/docs/api-platform/fundamentals/fault-handling)
+- [SpikeArrest](https://cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy)
+- [Quota](https://cloud.google.com/apigee/docs/api-platform/reference/policies/quota-policy)

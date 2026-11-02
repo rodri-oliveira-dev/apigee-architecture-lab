@@ -53,6 +53,8 @@ Policies são configuração, não substitutos automáticos para decisões arqui
 
 No módulo intermediário, `VerifyAPIKey` valida a consumer key apresentada em `x-api-key` e produz variáveis com a chave e os metadados associados. `verifyapikey.verify-api-key.client_id` contém essa consumer key — também chamada API key ou app key — enquanto `verifyapikey.verify-api-key.developer.app.name` representa o nome da aplicação cadastrada. O proxy usa `client_id` como `Identifier` da Quota, portanto contabiliza por credencial: múltiplas chaves da mesma aplicação e uma chave nova após rotação têm contadores independentes.
 
+Como o `SpikeArrest` vem depois de `VerifyAPIKey`, chamadas com credencial inválida falham antes dessa proteção contra rajadas; o bundle não mitiga nessa policy as tentativas anônimas. A proteção de borda anterior à autenticação é uma decisão separada. Aqui, o SpikeArrest aplica `10ps` ao proxy (sem `Identifier`), em janela deslizante regional com `UseEffectiveCount=true`; a Quota limita 100 requisições/minuto por consumer key em janela móvel. Esses valores são apenas didáticos.
+
 Depois da validação, uma `AssignMessage` remove `x-api-key`. As policies seguintes continuam usando as variáveis produzidas por `VerifyAPIKey`, mas a credencial não é enviada ao backend sem necessidade. O módulo avançado aplica o mesmo princípio ao header `Authorization`: valida o JWT, remove o bearer token e envia ao target somente o subject necessário, produzido pelo Shared Flow.
 
 ## Falhas e respostas do backend
