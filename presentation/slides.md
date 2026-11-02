@@ -39,7 +39,7 @@ Notas:
 ## Sobre mim
 
 <div class="about-layout">
-  <img class="about-photo" src="https://rodri-oliveira-dev.github.io/assets/profile/rodrigo-about.webp" alt="Retrato de Rodrigo de Oliveira" width="320" height="428" decoding="async">
+  <img class="about-photo" src="assets/images/rodrigo-about.webp" alt="Retrato de Rodrigo de Oliveira" width="320" height="428" decoding="async">
   <div class="about-intro">
     <h3>Rodrigo de Oliveira</h3>
     <p class="about-role">Arquiteto de Software · .NET · Sistemas Distribuídos · Cloud</p>
