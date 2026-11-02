@@ -17,7 +17,12 @@ const viewports = [
 mkdirSync(outputRoot, { recursive: true });
 const failures = [];
 const results = [];
-const browser = await puppeteer.launch({ headless: "shell" });
+// GitHub-hosted runners não oferecem o sandbox de namespaces necessário ao Chromium.
+// Desabilite-o somente no ambiente efêmero de CI, nunca na execução local.
+const browser = await puppeteer.launch({
+  headless: "shell",
+  args: process.env.CI === "true" ? ["--no-sandbox", "--disable-setuid-sandbox"] : []
+});
 try {
   const page = await browser.newPage();
   page.setDefaultTimeout(15000);
