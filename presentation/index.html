@@ -59,6 +59,7 @@
         transition: "fade",
         backgroundTransition: "fade",
         transitionSpeed: "fast",
+        view: window.matchMedia("(max-width: 767px)").matches ? "scroll" : "slide",
         scrollActivationWidth: 768,
         scrollLayout: "compact",
         scrollSnap: "proximity",
