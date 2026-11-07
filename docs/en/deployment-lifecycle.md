@@ -10,13 +10,16 @@ flowchart LR
     V --> Z[Versioned ZIP<br/>immutable hash]
     Z --> I[Import revision<br/>google_apigee_api]
     I --> D[Deploy by environment<br/>google_apigee_api_deployment]
-    D --> R[Runtime tests<br/>Debug and smoke tests]
+    D --> W[Bounded readiness check<br/>state READY or failure]
+    W --> R[Runtime tests<br/>Debug and smoke tests]
 ```
 
 The Google provider publicly documents `google_apigee_api`, which consumes a `config_bundle`, and `google_apigee_api_deployment`, which binds a proxy revision to an environment. These are official provider resources, not private module interfaces. This lab intentionally includes no runnable Terraform because it has no organization, environments, reachable backend, or shared state.
 
-Reusable modules should keep inputs explicit and preserve dependencies between proxies, environments, KVMs, Shared Flows, and deployments. A pipeline should build a deterministic ZIP, record its hash and version, run static and security checks, promote the same artifact across environments, and perform import/deploy plus runtime tests in a non-production environment.
+Deployment is eventually consistent: completion of the Terraform resource does not prove that every runtime instance has loaded the revision. Before tests, a pipeline should poll that revision's deployment status with bounded attempts and intervals, proceed only when `state` is `READY`, fail immediately on `ERROR`, and stop at the configured timeout. The bound prevents indefinite waits and tests from reaching the previous revision.
+
+Reusable modules should keep inputs explicit and preserve dependencies between proxies, environments, KVMs, Shared Flows, and deployments. A pipeline should build a deterministic ZIP, record its hash and version, run static and security checks, promote the same artifact across environments, import and deploy it, wait for the revision to become `READY` within a timeout, and then run tests in a non-production environment.
 
 Remote state needs encryption, least-privilege access, locking where supported, recovery/versioning, and auditability. Never commit state to Git or expose it in logs. Splitting state by responsibility and environment limits blast radius but requires clear contracts between stacks.
 
-Official references: [`google_apigee_api`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api), [`google_apigee_api_deployment`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api_deployment), and [Terraform remote state](https://developer.hashicorp.com/terraform/language/state/remote).
+Official references: [`google_apigee_api`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api), [`google_apigee_api_deployment`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api_deployment), [Apigee deployment status](https://cloud.google.com/apigee/docs/api-platform/deploy/ui-deploy-overview), and [Terraform remote state](https://developer.hashicorp.com/terraform/language/state/remote).

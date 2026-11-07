@@ -226,9 +226,9 @@ Mostre `verify-jwt → remove-authorization → call-shared-security`. Deixe a m
 
 Infrastructure as Code entra depois que o bundle já pode ser revisado e validado.
 
-Um pipeline gera um ZIP determinístico, registra hash e versão, usa o recurso oficial `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. Módulos reutilizáveis podem reduzir repetição, desde que entradas e dependências permaneçam explícitas.
+Um pipeline gera um ZIP determinístico, registra hash e versão, usa o recurso oficial `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. Depois, aguarda com timeout até o status da revisão ficar `READY` antes dos testes. Módulos reutilizáveis podem reduzir repetição, desde que entradas e dependências permaneçam explícitas.
 
-Shared Flow, KVM e environment podem criar ordem de implantação. Validação estática vem antes do deploy; importação, Debug e testes de runtime acontecem num environment não produtivo. Estado remoto exige criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. O laboratório não inclui interfaces privadas, credenciais, backend de estado ou código Terraform executável.
+Shared Flow, KVM e environment podem criar ordem de implantação. Como o deployment é eventualmente consistente, o readiness check consulta a revisão específica, avança em `READY`, falha em `ERROR` e termina ao atingir o limite; só então começam Debug e testes de runtime num environment não produtivo. Estado remoto exige criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. O laboratório não inclui interfaces privadas, credenciais, backend de estado ou código Terraform executável.
 
 Mostre o Mermaid e abra a documentação apenas se houver pergunta sobre provider. Destaque que os nomes dos dois recursos são públicos e oficialmente documentados; a estratégia de módulos é uma decisão de cada organização.
 
