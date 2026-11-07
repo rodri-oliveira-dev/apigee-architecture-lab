@@ -12,3 +12,7 @@
 10. **Quota por consumer key.** O `client_id` de `VerifyAPIKey` é a chave apresentada. A escolha mantém o exemplo simples e gera contadores separados para credenciais diferentes, inclusive durante rotação; não representa agregação por aplicação.
 11. **Status do backend preservado.** Respostas HTTP 4xx/5xx seguem o response flow, conservam seu status e recebem payload neutro. Falha de conectividade é diferente e retorna 502; falha interna inesperada do proxy retorna 500.
 12. **Conditional Flow observável.** `GET /` adiciona apenas `x-api-operation: list-orders`, mostrando execução condicional sem deslocar lógica de negócio para o gateway.
+13. **Extensão intermediária independente.** KVM e múltiplos targets ficam em `orders-routing`, preservando o exemplo básico e a cadeia principal de autenticação/tráfego.
+14. **Configuração externa validada.** A entrada de KVM é não sensível, usa variável `private.`, não é inicializada pelo bundle e precisa pertencer ao conjunto permitido antes de enriquecer ou rotear a mensagem.
+15. **Fallback somente após validação.** A RouteRule condicional vem antes da regra `primary` sem condição. Configuração ausente ou desconhecida falha explicitamente, em vez de selecionar um backend por acidente.
+16. **Terraform como ciclo, não como tema central.** A documentação cita somente recursos públicos do provider Google e separa bundle, importação, deployment e estado remoto; não cria módulos hipotéticos nem executa infraestrutura.

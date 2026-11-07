@@ -22,10 +22,12 @@ REQUIRED_DOCS = (
     "README.md",
     "README.en.md",
     "docs/pt-br/architecture.md",
+    "docs/pt-br/deployment-lifecycle.md",
     "docs/pt-br/validation.md",
     "docs/pt-br/presentation-guide.md",
     "docs/pt-br/speaker-script.md",
     "docs/en/architecture.md",
+    "docs/en/deployment-lifecycle.md",
     "docs/en/validation.md",
     "docs/en/presentation-guide.md",
     "examples/01-basic/README.md",
@@ -149,7 +151,13 @@ def validate_bundle(bundle: Path, shared_flow_names: set[str]) -> list[Finding]:
             for path in sorted(target_dir.glob("*.xml")):
                 root = parsed.get(path)
                 if root is not None and root.tag == "TargetEndpoint" and root.get("name"):
-                    targets.add(root.get("name", ""))
+                    target_name = root.get("name", "")
+                    if target_name in targets:
+                        findings.append(Finding(
+                            "ROUTE005", path,
+                            f"duplicate TargetEndpoint name '{target_name}'",
+                        ))
+                    targets.add(target_name)
                     valid_targets.append((path, root))
         for target_path, target_root in valid_targets:
             for name_node in target_root.findall(".//Step/Name"):
@@ -163,6 +171,15 @@ def validate_bundle(bundle: Path, shared_flow_names: set[str]) -> list[Finding]:
             route_rules = proxy_root.findall("./RouteRule")
             if not route_rules:
                 findings.append(Finding("ROUTE002", proxy_path, "at least one RouteRule is required by this lab"))
+            unconditional_routes = [
+                index for index, route in enumerate(route_rules)
+                if not (route.findtext("Condition", default="").strip())
+            ]
+            if any(index != len(route_rules) - 1 for index in unconditional_routes):
+                findings.append(Finding(
+                    "ROUTE004", proxy_path,
+                    "an unconditional RouteRule must be last because RouteRules are evaluated top-down",
+                ))
             for target_node in proxy_root.findall("./RouteRule/TargetEndpoint"):
                 reference = (target_node.text or "").strip()
                 if reference not in targets:

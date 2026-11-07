@@ -2,7 +2,7 @@
 
 A declarative lab for a technical presentation about API Management with Google Cloud Apigee. A fictitious orders API progresses from a minimal proxy to access and traffic controls, then to JWT, Shared Flows, and consistent fault handling.
 
-> **Scope:** XML bundles, documentation, diagrams, and static validation. This repository provisions no GCP infrastructure, working backend, credentials, deployment pipeline, or external integration. Reserved `example.invalid` hosts prevent accidental production use.
+> **Scope:** traditional Apigee XML bundles, documentation, diagrams, and static validation. A conceptual Terraform lifecycle is documented, but this repository provisions no GCP infrastructure, working backend, credentials, remote state, deployment, or external integration. Reserved `example.invalid` hosts prevent accidental production use.
 
 ## API Gateway and API Management
 
@@ -23,10 +23,12 @@ The `ProxyEndpoint` defines the consumer-facing interface and inbound/outbound f
 | Module | Focus | Runtime status |
 |---|---|---|
 | [01 — Basic](examples/01-basic/README.md) | API Proxy, endpoints, RouteRule | Structurally valid bundle; fictitious backend |
-| [02 — Intermediate](examples/02-intermediate/README.md) | API key, SpikeArrest, Quota, AssignMessage, conditional flow | Requires product/app/key in Apigee |
+| [02 — Intermediate](examples/02-intermediate/README.md) | API key, traffic, KVM, and multiple TargetEndpoints | Requires product/app/key and KVM in Apigee |
 | [03 — Advanced](examples/03-advanced/README.md) | JWT, Shared Flow, FlowCallout, FaultRules | Requires JWKS private variable and ordered deployment |
 
 Follow the numeric order. Compare each module's `PreFlow` to see the policy chain grow, and use the [presentation guide](docs/en/presentation-guide.md) for a 30-minute session.
+
+The independent `orders-routing` bundle under the intermediate module retrieves a non-sensitive KVM value, validates it, enriches the message, and selects one of two TargetEndpoints. The KVM is neither created nor accessed locally. The [deployment lifecycle guide](docs/en/deployment-lifecycle.md) places versioned bundles, reusable modules, dependencies, and remote state in a Terraform strategy without inventing private interfaces or performing a deployment.
 
 ## Presentation
 
@@ -76,7 +78,10 @@ A real run requires a provisioned Apigee organization and instance, environment/
 - [Understanding APIs and API proxies](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies)
 - [API proxy configuration reference](https://cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference)
 - [Policy reference](https://cloud.google.com/apigee/docs/api-platform/reference/policies/reference-overview-policy)
+- [KeyValueMapOperations](https://cloud.google.com/apigee/docs/api-platform/reference/policies/key-value-map-operations-policy)
+- [Routes and multiple TargetEndpoints](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-routes)
 - [Reusable Shared Flows](https://cloud.google.com/apigee/docs/api-platform/fundamentals/shared-flows)
 - [Fault handling](https://cloud.google.com/apigee/docs/api-platform/fundamentals/fault-handling)
+- [Terraform `google_apigee_api` resource](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api)
 
 Documentação em português: [README.md](README.md).

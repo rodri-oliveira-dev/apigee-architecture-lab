@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProxyEndpoint name="default">
+  <Description>Stable public contract with KVM-backed target selection.</Description>
+  <PreFlow name="PreFlow">
+    <Request>
+      <Step><Name>get-backend-region</Name></Step>
+      <Step>
+        <Name>reject-invalid-backend-region</Name>
+        <Condition>(private.lab.backend.region is null) or ((private.lab.backend.region != "primary") and (private.lab.backend.region != "secondary"))</Condition>
+      </Step>
+      <Step>
+        <Name>assign-backend-region</Name>
+        <Condition>(private.lab.backend.region = "primary") or (private.lab.backend.region = "secondary")</Condition>
+      </Step>
+    </Request>
+    <Response/>
+  </PreFlow>
+  <Flows/>
+  <PostFlow name="PostFlow"><Request/><Response/></PostFlow>
+  <HTTPProxyConnection><BasePath>/lab/v1/orders-routing</BasePath></HTTPProxyConnection>
+  <RouteRule name="secondary-route">
+    <Condition>private.lab.backend.region = "secondary"</Condition>
+    <TargetEndpoint>secondary</TargetEndpoint>
+  </RouteRule>
+  <RouteRule name="primary-fallback">
+    <TargetEndpoint>primary</TargetEndpoint>
+  </RouteRule>
+</ProxyEndpoint>

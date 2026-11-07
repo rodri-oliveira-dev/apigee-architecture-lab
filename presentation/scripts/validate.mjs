@@ -63,7 +63,7 @@ checkLocalReferences(index, outputRoot, "index.html");
 checkLocalReferences(slides, outputRoot, "slides.md");
 
 const slideCount = slides ? slides.split(/^---$/m).length : 0;
-if (slideCount !== 14) failures.push(`quantidade de slides esperada: 14; encontrada: ${slideCount}`);
+if (slideCount !== 16) failures.push(`quantidade de slides esperada: 16; encontrada: ${slideCount}`);
 const separator = index.match(/data-separator="([^"]+)"/)?.[1];
 if (!separator) {
   failures.push("data-separator não configurado no Reveal.js");
@@ -94,7 +94,7 @@ if (!index.includes('data-separator-notes="^Notas?:"') || !index.includes("Revea
   failures.push("Speaker View e separador de notas não estão configurados");
 }
 
-for (const name of ["architecture.svg", "message-lifecycle.svg", "advanced-flow.svg"]) {
+for (const name of ["architecture.svg", "message-lifecycle.svg", "advanced-flow.svg", "deployment-lifecycle.svg"]) {
   const path = resolve(outputRoot, "assets", "diagrams", name);
   const svg = read(path);
   if (svg && !/<svg[\s>]/.test(svg)) failures.push(`${name}: conteúdo SVG inválido`);

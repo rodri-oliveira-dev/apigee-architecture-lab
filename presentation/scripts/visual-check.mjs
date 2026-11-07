@@ -31,7 +31,7 @@ try {
   await page.waitForFunction(() => globalThis.Reveal?.isReady());
   await page.evaluate(() => Reveal.configure({ transition: "none", backgroundTransition: "none" }));
   const slideCount = await page.evaluate(() => Reveal.getTotalSlides());
-  if (slideCount !== 14) failures.push("Reveal.js renderizou " + slideCount + " slides; esperados: 14");
+  if (slideCount !== 16) failures.push("Reveal.js renderizou " + slideCount + " slides; esperados: 16");
 
   // Testa notas uma vez; não devem ser exibidas na projeção.
   try {
@@ -177,7 +177,7 @@ try {
   if (mobile.documentWidth > mobile.viewportWidth + 1) {
     mobileIssues.push("overflow horizontal no documento");
   }
-  if (mobile.slides !== 14) mobileIssues.push("contagem de slides divergente");
+  if (mobile.slides !== 16) mobileIssues.push("contagem de slides divergente");
   results.push({ viewport: "390x844", ...mobile, issues: mobileIssues });
   if (mobileIssues.length) {
     failures.push("390x844: " + mobileIssues.join("; ") + " " + JSON.stringify(mobile));
@@ -187,7 +187,7 @@ try {
 } finally {
   await browser.close();
   writeFileSync(join(outputRoot, "report.json"), JSON.stringify({
-    url, expectedSlides: 14, viewports, failures, results
+    url, expectedSlides: 16, viewports, failures, results
   }, null, 2) + "\n");
 }
 
@@ -195,5 +195,5 @@ if (failures.length) {
   console.error("Inspeção visual encontrou " + failures.length + " problema(s):\n- " + failures.join("\n- "));
   process.exitCode = 1;
 } else {
-  console.log("Inspeção visual aprovada: 14 slides em " + viewports.length + " resoluções, Speaker View, cortes e legibilidade.");
+  console.log("Inspeção visual aprovada: 16 slides em " + viewports.length + " resoluções, Speaker View, cortes e legibilidade.");
 }
