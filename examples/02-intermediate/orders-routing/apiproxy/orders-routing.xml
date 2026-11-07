@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy revision="1" name="orders-routing">
+  <DisplayName>Orders Routing</DisplayName>
+  <Description>Teaching extension for KVM-backed configuration and conditional targets.</Description>
+  <Policies>
+    <Policy>assign-backend-region</Policy>
+    <Policy>get-backend-region</Policy>
+    <Policy>reject-invalid-backend-region</Policy>
+  </Policies>
+  <ProxyEndpoints><ProxyEndpoint>default</ProxyEndpoint></ProxyEndpoints>
+  <TargetEndpoints>
+    <TargetEndpoint>primary</TargetEndpoint>
+    <TargetEndpoint>secondary</TargetEndpoint>
+  </TargetEndpoints>
+</APIProxy>

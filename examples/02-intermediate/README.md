@@ -44,6 +44,28 @@ sequenceDiagram
 
 Para relacionar chave válida/inválida, SpikeArrest e Quota a requisições e códigos HTTP, consulte os [cenários ilustrativos](../../docs/pt-br/http-scenarios.md). Eles não foram executados em runtime.
 
+## Extensão — KVM e múltiplos TargetEndpoints
+
+`orders-routing/apiproxy/` é um segundo bundle, independente do exemplo principal, criado para demonstrar configuração externa e roteamento sem sobrecarregar a progressão básica. O contrato público permanece `/lab/v1/orders-routing`; as URLs fictícias ficam encapsuladas nos TargetEndpoints `primary` e `secondary`.
+
+1. `get-backend-region` lê a chave não sensível `backend-region` da KVM de environment `orders-routing-config` e grava o valor em `private.lab.backend.region`.
+2. A leitura usa `continueOnError="true"` somente para permitir que `reject-invalid-backend-region` produza um erro controlado quando a KVM/entrada não puder ser lida, o valor estiver ausente ou fora do conjunto `primary | secondary`.
+3. `assign-backend-region` usa a variável em um header técnico somente quando ela é válida.
+4. A RouteRule condicional para `secondary` vem antes da regra sem condição. A regra final é o fallback `primary`; a validação anterior impede que um valor desconhecido caia silenciosamente nesse fallback.
+
+```mermaid
+flowchart LR
+    C[Contrato público] --> K[GET KVM<br/>backend-region]
+    K --> V{primary ou secondary?}
+    V -->|não| E[RaiseFault 500 controlado]
+    V -->|sim| A[AssignMessage<br/>x-backend-region]
+    A --> R{RouteRules em ordem}
+    R -->|secondary| S[TargetEndpoint secondary]
+    R -->|fallback validado| P[TargetEndpoint primary]
+```
+
+A KVM e a entrada **não são criadas pelo bundle nem por este repositório**. Elas precisam existir no environment antes do teste em runtime. O laboratório não inclui `InitialEntries`, pois um redeploy poderia sobrescrever valores persistidos. No Apigee atual, as entradas de KVM são criptografadas; o prefixo `private.` evita que o valor recuperado apareça em Debug. Isso não transforma KVM em cofre de segredos nem elimina a necessidade de IAM, rotação e classificação de dados. KVM é uma capacidade da plataforma, não um padrão obrigatório para toda solução.
+
 ## English
 
 **Problem:** block anonymous access, control bursts, cap per-application consumption, and propagate correlation. A Conditional Flow for `GET /` acts as a structural marker: its `Request` and `Response` blocks are empty, so it executes no business behavior. It only shows where operation-specific Steps could be attached.
@@ -52,4 +74,6 @@ The ProxyEndpoint executes `VerifyAPIKey → SpikeArrest → Quota → AssignMes
 
 The bundle is statically checkable, but runtime API-key verification requires an API product, developer app, and issued key. Quota consumes the verified `client_id`. With `UseEffectiveCount=true`, SpikeArrest uses a regional sliding window for the whole proxy because no client identifier is configured; Quota governs each application's rolling-window consumption. Synchronous distributed quota counting favors strictness but may reduce throughput. Authenticate before per-consumer accounting, size limits from evidence, and do not treat `messageid` as a business identifier.
 
-[Verify API Key](https://cloud.google.com/apigee/docs/api-platform/reference/policies/verify-api-key-policy) · [Spike Arrest](https://cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy) · [Quota](https://cloud.google.com/apigee/docs/api-platform/reference/policies/quota-policy) · [Assign Message](https://cloud.google.com/apigee/docs/api-platform/reference/policies/assign-message-policy)
+The independent `orders-routing` extension reads the non-sensitive `backend-region` entry from an environment-scoped KVM, validates it, enriches the request with `AssignMessage`, and routes to either the `primary` or `secondary` named TargetEndpoint. The conditional route is declared first and the validated primary fallback last. The KVM must be provisioned in an Apigee environment; this repository performs no KVM operation or deployment.
+
+[Verify API Key](https://cloud.google.com/apigee/docs/api-platform/reference/policies/verify-api-key-policy) · [Spike Arrest](https://cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy) · [Quota](https://cloud.google.com/apigee/docs/api-platform/reference/policies/quota-policy) · [Assign Message](https://cloud.google.com/apigee/docs/api-platform/reference/policies/assign-message-policy) · [KVM Operations](https://cloud.google.com/apigee/docs/api-platform/reference/policies/key-value-map-operations-policy) · [Routes](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-routes)

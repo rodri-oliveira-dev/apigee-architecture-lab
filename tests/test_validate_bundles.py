@@ -63,6 +63,17 @@ class ValidatorTests(unittest.TestCase):
             (bundle / "targets" / "default.xml").write_text(TARGET.replace('name="default"', 'name="other"'), encoding="utf-8")
             self.assertIn("ROUTE003", self.codes(root))
 
+    def test_reports_unconditional_route_before_conditional_route(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            bundle = self.make_bundle(root)
+            proxy = PROXY.replace(
+                "</ProxyEndpoint>",
+                '<RouteRule name="conditional"><Condition>request.verb = "GET"</Condition><TargetEndpoint>default</TargetEndpoint></RouteRule></ProxyEndpoint>',
+            )
+            (bundle / "proxies" / "default.xml").write_text(proxy, encoding="utf-8")
+            self.assertIn("ROUTE004", self.codes(root))
+
     def test_reports_missing_policy_referenced_by_target_step(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -185,6 +196,49 @@ class AdvancedBundleContractTests(unittest.TestCase):
         ).getroot()
         self.assertIsNone(sanitizer.find("./Set/StatusCode"))
         self.assertNotIn("fault.", sanitizer.findtext("./Set/Payload"))
+
+
+class RoutingExtensionContractTests(unittest.TestCase):
+    root = Path(__file__).resolve().parents[1]
+    bundle = root / "examples/02-intermediate/orders-routing/apiproxy"
+
+    def test_kvm_value_is_validated_then_used_by_assign_message(self):
+        proxy = ET.parse(self.bundle / "proxies/default.xml").getroot()
+        steps = proxy.findall("./PreFlow/Request/Step")
+        self.assertEqual(
+            ["get-backend-region", "reject-invalid-backend-region", "assign-backend-region"],
+            [step.findtext("Name") for step in steps],
+        )
+        self.assertIn("is null", steps[1].findtext("Condition"))
+        self.assertIn("private.lab.backend.region", steps[2].findtext("Condition"))
+
+        kvm = ET.parse(self.bundle / "policies/get-backend-region.xml").getroot()
+        self.assertEqual("orders-routing-config", kvm.get("mapIdentifier"))
+        self.assertEqual("true", kvm.get("continueOnError"))
+        self.assertEqual("environment", kvm.findtext("Scope"))
+        self.assertEqual("private.lab.backend.region", kvm.find("Get").get("assignTo"))
+        self.assertEqual("backend-region", kvm.findtext("Get/Key/Parameter"))
+
+        assign = ET.parse(self.bundle / "policies/assign-backend-region.xml").getroot()
+        self.assertEqual(
+            "{private.lab.backend.region}",
+            assign.findtext("Set/Headers/Header[@name='x-backend-region']"),
+        )
+
+    def test_conditional_target_precedes_primary_fallback(self):
+        proxy = ET.parse(self.bundle / "proxies/default.xml").getroot()
+        routes = proxy.findall("RouteRule")
+        self.assertEqual(["secondary-route", "primary-fallback"], [route.get("name") for route in routes])
+        self.assertEqual("secondary", routes[0].findtext("TargetEndpoint"))
+        self.assertEqual('private.lab.backend.region = "secondary"', routes[0].findtext("Condition"))
+        self.assertEqual("primary", routes[1].findtext("TargetEndpoint"))
+        self.assertIsNone(routes[1].find("Condition"))
+
+        descriptor = ET.parse(self.bundle / "orders-routing.xml").getroot()
+        self.assertEqual(
+            {"primary", "secondary"},
+            {node.text for node in descriptor.findall("TargetEndpoints/TargetEndpoint")},
+        )
 
 
 if __name__ == "__main__":

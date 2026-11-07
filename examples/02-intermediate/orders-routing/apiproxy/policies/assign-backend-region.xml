@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="assign-backend-region" continueOnError="false" enabled="true">
+  <DisplayName>Assign Backend Region Context</DisplayName>
+  <Set>
+    <Headers>
+      <Header name="x-backend-region">{private.lab.backend.region}</Header>
+    </Headers>
+  </Set>
+  <AssignTo createNew="false" transport="http" type="request"/>
+</AssignMessage>

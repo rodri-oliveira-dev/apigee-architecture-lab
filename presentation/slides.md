@@ -32,7 +32,7 @@ Notas:
 
 ---
 
-<!-- .slide: class="about-slide" data-timing="60" -->
+<!-- .slide: class="about-slide" data-timing="45" -->
 
 <div class="eyebrow">QUEM CONDUZ ESTA CONVERSA</div>
 
@@ -70,7 +70,7 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="110" -->
+<!-- .slide: data-timing="90" -->
 
 ## APIs crescem. A complexidade também.
 
@@ -98,7 +98,7 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="120" -->
+<!-- .slide: data-timing="100" -->
 
 ## Gateway executa. Management governa.
 
@@ -133,7 +133,7 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="140" -->
+<!-- .slide: data-timing="110" -->
 
 ## Uma fronteira entre consumidor e backend
 
@@ -166,41 +166,42 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="130" -->
+<!-- .slide: data-timing="120" -->
 
-## Anatomia do API Proxy
+## Anatomia de um API Proxy no Apigee
 
 <div class="split split-45">
 <div>
 
 ```text
 apiproxy/
-├── orders-basic.xml
+├── orders-basic.xml # configuração-base
 ├── proxies/
 │   └── default.xml
 ├── targets/
 │   └── default.xml
-└── policies/       # quando necessário
+├── policies/        # quando houver policies
+└── resources/       # scripts/JAR/XSLT, se usados
 ```
 
 </div>
 <div class="stack-cards">
-  <div><strong>ProxyEndpoint</strong><span>interface, flows e RouteRule</span></div>
-  <div><strong>TargetEndpoint</strong><span>conexão e flows de destino</span></div>
-  <div><strong>Policies</strong><span>unidades anexadas por Steps</span></div>
+  <div><strong>Necessário aqui</strong><span>descritor + ProxyEndpoint + TargetEndpoint</span></div>
+  <div><strong>Conforme o desenho</strong><span>policies e resources referenciados</span></div>
+  <div><strong>Metadados</strong><span>listas do descritor podem ser geradas pela UI</span></div>
 </div>
 </div>
 
 <div class="source-line"><code>examples/01-basic/apiproxy/</code> · {{github:examples/01-basic/apiproxy/orders-basic.xml|Ver descritor}}</div>
 
 Notas:
-**Mensagem principal:** Diretórios, descritores e nomes formam o artefato declarativo que o Apigee importa e implanta.
+**Mensagem principal:** Esta árvore é um exemplo de bundle XML tradicional do Apigee, não uma estrutura universal de API Gateways.
 
 **Abertura:** No repositório, essa arquitetura aparece como uma estrutura pequena e deliberadamente explícita.
 
-**Explicação principal:** O descritor raiz identifica o proxy e declara seus endpoints e policies. `proxies/default.xml` define a interface e o roteamento; `targets/default.xml` define o destino. Policies ficam em arquivos próprios e só executam quando um Step as referencia.
+**Explicação principal:** O descritor raiz identifica o proxy. `proxies/default.xml` define a interface e o roteamento; `targets/default.xml` define o destino. `policies/` só é necessário quando há policies, e `resources/` aparece quando scripts, JARs ou XSLT são usados. As listas `Policies`, `ProxyEndpoints` e `TargetEndpoints` no descritor são metadados opcionais, frequentemente gerados pela UI.
 
-**Contexto arquitetural:** A separação favorece revisão e manutenção: conseguimos discutir contrato, destino e controles individualmente. Ao mesmo tempo, os nomes viram ligações formais entre arquivos e precisam permanecer coerentes.
+**Contexto arquitetural:** `manifests/` não é um diretório padrão da estrutura de bundle documentada pelo Apigee; por isso não adicionamos um diretório artificial. O laboratório escolhe arquivos XML versionados, mas proxies também podem ser criados e editados pela UI ou APIs da plataforma. A estrutura mostrada não deve ser generalizada para outros gateways.
 
 **Demonstração:** Abra `examples/01-basic/apiproxy/`. Mostre que o módulo básico não possui diretório de policies: ele expõe o esqueleto mínimo antes de acrescentarmos comportamento.
 
@@ -210,9 +211,9 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="130" -->
+<!-- .slide: data-timing="110" -->
 
-## XMLs se conectam por nome
+## Como os XMLs de um proxy Apigee se relacionam
 
 <div class="split code-and-model">
 <div>
@@ -248,9 +249,9 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="180" -->
+<!-- .slide: data-timing="150" -->
 
-## O ciclo de execução dos Flows
+## Ciclo de execução dos Flows no Apigee
 
 <div class="diagram-frame flow-diagram">
   {{mermaid:docs/pt-br/architecture.md|2|message-lifecycle|Request e response entre ProxyEndpoint e TargetEndpoint}}
@@ -281,7 +282,7 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="180" -->
+<!-- .slide: data-timing="140" -->
 
 ## Autenticar, minimizar e contabilizar
 
@@ -319,11 +320,51 @@ Notas:
 
 **Arquivos demonstrados:** `examples/02-intermediate/apiproxy/proxies/default.xml`, `verify-api-key.xml`, `remove-api-key.xml`, `quota.xml` e `assign-list-orders-context.xml`.
 
-**Transição:** No avançado, acrescentamos identidade assinada e reuso.
+**Transição:** Antes do avançado, vamos externalizar uma decisão não sensível e usá-la para escolher entre dois destinos.
 
 ---
 
-<!-- .slide: data-timing="180" -->
+<!-- .slide: data-timing="150" -->
+
+## KVM e múltiplos TargetEndpoints
+
+<div class="split policy-slide">
+<div>
+
+{{xml:examples/02-intermediate/orders-routing/apiproxy/policies/get-backend-region.xml|3:10|2|3-7}}
+
+<div class="source-line"><code>get-backend-region.xml</code> · {{github:examples/02-intermediate/orders-routing/apiproxy/policies/get-backend-region.xml|Ver KVM policy}}</div>
+
+</div>
+<div>
+
+{{xml:examples/02-intermediate/orders-routing/apiproxy/proxies/default.xml|21:27|3|1-3,5-6}}
+
+<div class="source-line"><code>proxies/default.xml</code> · {{github:examples/02-intermediate/orders-routing/apiproxy/proxies/default.xml|Ver RouteRules}}</div>
+
+</div>
+</div>
+
+<div class="pipeline"><b>KVM → variável privada</b><i>→</i><span>validar configuração</span><i>→</i><span>AssignMessage</span><i>→</i><span>secondary ou fallback primary</span></div>
+
+Notas:
+**Mensagem principal:** Uma KVM pode externalizar configuração; RouteRules ordenadas selecionam TargetEndpoints sem alterar o contrato público.
+
+**Abertura:** Esta extensão é independente do proxy intermediário principal e mantém o BasePath estável enquanto escolhe um backend fictício.
+
+**Explicação principal:** `get-backend-region` lê a chave não sensível `backend-region` da KVM de environment `orders-routing-config` para `private.lab.backend.region`. A leitura continua somente até uma RaiseFault controlada quando a KVM/entrada falha, está ausente ou contém valor diferente de `primary` e `secondary`. Só então AssignMessage adiciona o contexto técnico. A RouteRule condicional para `secondary` vem primeiro; a regra sem condição para `primary` é o fallback final.
+
+**Contexto arquitetural:** RouteRules são avaliadas de cima para baixo e a primeira compatível vence. A validação anterior impede que uma configuração inválida caia silenciosamente no fallback. A KVM e a entrada não são criadas pelo bundle; sem uma organização e um environment provisionados, este repositório só valida a estrutura. No Apigee atual, KVMs são criptografadas, e `private.` impede exposição do valor em Debug. KVM não é obrigatória nem substitui um cofre de segredos.
+
+**Demonstração:** Compare os TargetEndpoints `primary.xml` e `secondary.xml`. Mostre a condição opcional do Step de AssignMessage e destaque que nenhum hostname aparece no contrato público.
+
+**Arquivos demonstrados:** `examples/02-intermediate/orders-routing/apiproxy/` e `examples/02-intermediate/README.md`.
+
+**Transição:** Com configuração e roteamento explícitos, avançamos para identidade assinada, reuso e tratamento de falhas.
+
+---
+
+<!-- .slide: data-timing="150" -->
 
 ## Confiança, reuso e falhas explícitas
 
@@ -354,11 +395,44 @@ Notas:
 
 **Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml`, `verify-jwt.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
 
-**Transição:** Essas escolhas nos levam aos guardrails de arquitetura.
+**Transição:** Esses artefatos precisam chegar aos environments com dependências e versões controladas.
 
 ---
 
-<!-- .slide: data-timing="120" -->
+<!-- .slide: data-timing="140" -->
+
+## Terraform no ciclo de implantação
+
+<div class="diagram-frame flow-diagram">
+  {{mermaid:docs/pt-br/deployment-lifecycle.md|1|deployment-lifecycle|Validação, importação e implantação do bundle por ambiente}}
+</div>
+
+<div class="flow-notes">
+  <span><b>Bundle:</b> comportamento do proxy</span>
+  <span><b>Terraform:</b> recursos e dependências</span>
+  <span><b>Estado remoto:</b> acesso, locking e recuperação</span>
+</div>
+
+<div class="source-line"><code>docs/pt-br/deployment-lifecycle.md</code> · {{github:docs/pt-br/deployment-lifecycle.md|Ver ciclo completo}}</div>
+
+Notas:
+**Mensagem principal:** O bundle versionado é um artefato; Terraform pode importar sua revisão e implantá-la por environment sem misturar todas as responsabilidades.
+
+**Abertura:** Infrastructure as Code entra depois que o bundle já pode ser revisado e validado.
+
+**Explicação principal:** Um pipeline gera um ZIP determinístico, registra hash e versão, usa o recurso oficial `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. Depois, aguarda com timeout até o status da revisão ficar `READY` antes dos testes. Módulos reutilizáveis podem reduzir repetição, desde que entradas e dependências permaneçam explícitas.
+
+**Contexto arquitetural:** Shared Flow, KVM e environment podem criar ordem de implantação. Como o deployment é eventualmente consistente, o readiness check consulta a revisão específica, avança em `READY`, falha em `ERROR` e termina ao atingir o limite; só então começam Debug e testes de runtime num environment não produtivo. Estado remoto exige criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. O laboratório não inclui interfaces privadas, credenciais, backend de estado ou código Terraform executável.
+
+**Demonstração:** Mostre o Mermaid e abra a documentação apenas se houver pergunta sobre provider. Destaque que os nomes dos dois recursos são públicos e oficialmente documentados; a estratégia de módulos é uma decisão de cada organização.
+
+**Arquivos demonstrados:** `docs/pt-br/deployment-lifecycle.md` e `docs/en/deployment-lifecycle.md`.
+
+**Transição:** Agora podemos condensar essas decisões em guardrails de revisão.
+
+---
+
+<!-- .slide: data-timing="90" -->
 
 ## Guardrails arquiteturais
 
@@ -390,16 +464,16 @@ Notas:
 
 ---
 
-<!-- .slide: data-timing="180" -->
+<!-- .slide: data-timing="150" -->
 
 ## Demonstração: siga a evolução
 
 <div class="demo-path">
-  <div><span>01 · 35 s</span><strong>Básico</strong><small>BasePath + RouteRule</small></div>
+  <div><span>01 · 30 s</span><strong>Básico</strong><small>BasePath + RouteRule</small></div>
   <i>→</i>
-  <div><span>02 · 55 s</span><strong>Intermediário</strong><small>chave inválida → 401</small></div>
+  <div><span>02 · 45 s</span><strong>Intermediário</strong><small>chave inválida → 401</small></div>
   <i>→</i>
-  <div><span>03 · 50 s</span><strong>Avançado</strong><small>JWT 401 · target 502</small></div>
+  <div><span>03 · 40 s</span><strong>Avançado</strong><small>JWT 401 · target 502</small></div>
 </div>
 
 ```bash
@@ -423,7 +497,7 @@ Notas:
 
 **Contexto arquitetural:** Os resultados dependem do runtime e de recursos externos. Não mostramos HTTP 200 porque o backend é fictício. O código offline não é um emulador Apigee; o validador confirma apenas XML e referências locais.
 
-**Demonstração:** Deixe abertos `docs/pt-br/http-scenarios.md` e os ProxyEndpoints. Reserve 35 segundos para BasePath e RouteRule, 55 segundos para a chave inválida e os limites condicionais 429, e 50 segundos para JWT.failed → 401 e falha do target → 502. Nos 40 segundos finais, execute os comandos do slide. O cenário de backend 404 sanitizado fica para perguntas. Não execute `curl` para `.invalid`.
+**Demonstração:** Deixe abertos `docs/pt-br/http-scenarios.md` e os ProxyEndpoints. Reserve 30 segundos para BasePath e RouteRule, 45 segundos para a chave inválida e os limites condicionais 429, e 40 segundos para JWT.failed → 401 e falha do target → 502. Nos 35 segundos finais, execute os comandos do slide. O cenário de backend 404 sanitizado fica para perguntas. Não execute `curl` para `.invalid`.
 
 **Arquivos demonstrados:** `docs/pt-br/http-scenarios.md`, `scripts/demo_http_scenarios.py`, `scripts/validate_bundles.py`, `examples/01-basic/`, `examples/02-intermediate/` e `examples/03-advanced/`.
 
@@ -431,7 +505,7 @@ Notas:
 
 ---
 
-<!-- .slide: class="closing-slide" data-timing="90" -->
+<!-- .slide: class="closing-slide" data-timing="75" -->
 
 <div class="eyebrow">PRINCIPAIS APRENDIZADOS</div>
 
