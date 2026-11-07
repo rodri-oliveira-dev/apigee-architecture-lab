@@ -10,7 +10,7 @@ test("Reveal.js reconhece todos os slides definidos no Markdown", () => {
   assert.ok(separator, "data-separator deve estar presente no HTML");
   const expectedCount = markdown.split(/^---$/m).length;
   const renderedCount = markdown.split(new RegExp(separator, "gm")).length;
-  assert.equal(expectedCount, 14);
+  assert.equal(expectedCount, 16);
   assert.equal(renderedCount, expectedCount, "todos os separadores devem seguir o padrão do Reveal.js");
 });
 

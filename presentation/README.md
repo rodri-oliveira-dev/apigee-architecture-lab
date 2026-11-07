@@ -1,6 +1,6 @@
 # Apresentação técnica — Google Cloud Apigee
 
-Apresentação em português brasileiro, com 14 slides e 28 minutos de exposição, seguidos por perguntas. O slide 12 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
+Apresentação em português brasileiro, com 16 slides e 28 minutos de exposição, seguidos por perguntas. O slide 14 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
 
 ## Pré-requisitos
 
@@ -74,7 +74,7 @@ O arquivo `slides.md` é o template editorial. As diretivas `xml`, `mermaid` e `
 
 `npm run validate:mermaid` testa o parser e renderiza todos os blocos Mermaid encontrados nos arquivos Markdown, inclusive cercas com até três espaços de indentação, informando arquivo, linha e bloco em caso de erro. `npm run generate:speaker-script` gera `docs/pt-br/speaker-script.md` a partir das notas, que são a única fonte editorial da fala. Build e validação falham se o roteiro estiver desatualizado. `npm run validate` confirma quantidade e tempos dos slides, estrutura das notas, trechos XML, arquivos referenciados, SVGs, workspace e recursos do Reveal.js. Essas verificações não substituem uma revisão visual em navegador.
 
-Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 14 slides em Chromium em **1920×1080, 1366×768, 1280×720 e 1024×768**. O teste verifica a quantidade real de slides renderizados, Speaker View, elementos fora da área do slide, overflow, truncamentos visíveis por CSS, tamanho mínimo do texto principal e auxiliar após a escala do Reveal.js, imagens locais quebradas e notas indevidamente visíveis. Os limites de fonte diferem por resolução e são heurísticas de legibilidade, não uma certificação de acessibilidade.
+Com o servidor local em execução, `npm run validate:visual --prefix presentation` percorre os 16 slides em Chromium em **1920×1080, 1366×768, 1280×720 e 1024×768**. O teste verifica a quantidade real de slides renderizados, Speaker View, elementos fora da área do slide, overflow, truncamentos visíveis por CSS, tamanho mínimo do texto principal e auxiliar após a escala do Reveal.js, imagens locais quebradas e notas indevidamente visíveis. Os limites de fonte diferem por resolução e são heurísticas de legibilidade, não uma certificação de acessibilidade.
 
 As capturas ficam em `presentation/dist/visual-check/<largura>x<altura>/` e o relatório estruturado em `presentation/dist/visual-check/report.json`. O job `visual-validation` executa essa verificação em pull requests direcionados à `main` e em pushes na `main` ou em branches `feature/**`. Em caso de falha, publica as capturas e o relatório como artefato do GitHub Actions por sete dias. O teste é orientado a desktop/projeção; a experiência em dispositivos móveis exige revisão específica de layout.
 

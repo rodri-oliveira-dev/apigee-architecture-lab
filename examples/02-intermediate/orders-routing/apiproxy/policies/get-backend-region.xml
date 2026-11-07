@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<KeyValueMapOperations name="get-backend-region" mapIdentifier="orders-routing-config" continueOnError="true" enabled="true">
+  <DisplayName>Get Backend Region</DisplayName>
+  <Scope>environment</Scope>
+  <ExpiryTimeInSecs>300</ExpiryTimeInSecs>
+  <Get assignTo="private.lab.backend.region" index="1">
+    <Key>
+      <Parameter>backend-region</Parameter>
+    </Key>
+  </Get>
+</KeyValueMapOperations>

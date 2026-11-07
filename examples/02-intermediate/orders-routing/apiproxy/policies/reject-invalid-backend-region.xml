@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RaiseFault name="reject-invalid-backend-region" continueOnError="false" enabled="true">
+  <DisplayName>Reject Missing or Invalid Backend Region</DisplayName>
+  <FaultResponse>
+    <Set>
+      <Headers><Header name="Content-Type">application/json</Header></Headers>
+      <Payload contentType="application/json">{"error":"configuration_unavailable","message":"The API routing configuration is unavailable."}</Payload>
+      <StatusCode>500</StatusCode>
+      <ReasonPhrase>Internal Server Error</ReasonPhrase>
+    </Set>
+  </FaultResponse>
+</RaiseFault>

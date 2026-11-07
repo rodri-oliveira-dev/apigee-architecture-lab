@@ -2,7 +2,7 @@
 
 Laboratório declarativo para uma apresentação técnica sobre API Management com o Google Cloud Apigee. A API fictícia de pedidos evolui de um proxy mínimo para controles de acesso e tráfego e, por fim, JWT, Shared Flows e tratamento de falhas por categoria.
 
-> **Escopo:** bundles XML, documentação, diagramas e validação estática. Não há infraestrutura GCP, backend funcional, credenciais, deploy ou integração externa. Os hosts `example.invalid` são reservados e impedem uso acidental como produção.
+> **Escopo:** bundles XML tradicionais do Apigee, documentação, diagramas e validação estática. Há uma visão conceitual do ciclo com Terraform, mas não há infraestrutura GCP, backend funcional, credenciais, deploy, estado remoto ou integração externa. Os hosts `example.invalid` são reservados e impedem uso acidental como produção.
 
 ## API Gateway e API Management
 
@@ -23,10 +23,12 @@ No proxy, o `ProxyEndpoint` define a interface voltada ao consumidor e os fluxos
 | Módulo | Foco | Estado executável |
 |---|---|---|
 | [01 — Básico](examples/01-basic/README.md) | API Proxy, endpoints e RouteRule | Bundle estruturalmente válido; backend fictício |
-| [02 — Intermediário](examples/02-intermediate/README.md) | API key, remoção da credencial, tráfego e fluxo condicional | Exige produto/app/chave no Apigee |
+| [02 — Intermediário](examples/02-intermediate/README.md) | API key, tráfego, KVM e múltiplos TargetEndpoints | Exige produto/app/chave e KVM no Apigee |
 | [03 — Avançado](examples/03-advanced/README.md) | JWT, Shared Flow e falhas de proxy, target e backend | Exige JWKS em variável privada e deploy ordenado |
 
 Siga a ordem numérica. Compare o `PreFlow` dos módulos para perceber como a cadeia de políticas cresce e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 30 minutos.
+
+O bundle `orders-routing`, dentro do módulo intermediário, é uma extensão didática independente: recupera uma configuração não sensível de KVM, valida o valor, enriquece a mensagem e escolhe entre dois TargetEndpoints. A KVM não é criada nem acessada localmente. O [guia de ciclo de implantação](docs/pt-br/deployment-lifecycle.md) posiciona bundles versionados, módulos reutilizáveis, dependências e estado remoto numa estratégia Terraform sem apresentar interfaces privadas ou executar deploy.
 
 A [demonstração de cenários HTTP ilustrativos](docs/pt-br/http-scenarios.md) relaciona requisições, policies e respostas condicionais. Para apresentar sem Google Cloud, execute `python scripts/demo_http_scenarios.py`: o comando **lê os XMLs**, não envia requisições e não emula o runtime Apigee.
 
@@ -78,7 +80,10 @@ Uma execução real requer organização e instância Apigee provisionadas, envi
 - [Entendendo APIs e API proxies](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies)
 - [Referência de configuração de API Proxy](https://cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference)
 - [Referência de Policies](https://cloud.google.com/apigee/docs/api-platform/reference/policies/reference-overview-policy)
+- [KeyValueMapOperations](https://cloud.google.com/apigee/docs/api-platform/reference/policies/key-value-map-operations-policy)
+- [Rotas e múltiplos TargetEndpoints](https://cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-routes)
 - [Shared Flows reutilizáveis](https://cloud.google.com/apigee/docs/api-platform/fundamentals/shared-flows)
 - [Tratamento de falhas](https://cloud.google.com/apigee/docs/api-platform/fundamentals/fault-handling)
+- [Recurso Terraform `google_apigee_api`](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/apigee_api)
 
 English documentation: [README.en.md](README.en.md).
