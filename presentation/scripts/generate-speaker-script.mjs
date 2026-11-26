@@ -19,7 +19,7 @@ function cleanInline(value) {
 
 function field(notes, label) {
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = notes.match(new RegExp(`\\*\\*${escaped}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\n\\*\\*[^*]+:\\*\\*|$)`));
+  const match = notes.match(new RegExp(`(?:^|\\n)\\*\\*${escaped}:\\*\\*[ \\t]*([\\s\\S]*?)(?=\\n(?:[ \\t]*\\n)*\\*\\*[^*\\n]+:\\*\\*|$)`));
   return match?.[1].trim() ?? "";
 }
 
