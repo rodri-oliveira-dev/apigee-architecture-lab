@@ -1,6 +1,6 @@
 # Guia da apresentação — 28 minutos + perguntas
 
-A apresentação executável em [`presentation/`](../../presentation/README.md) tem 16 slides e atende desenvolvedores e arquitetos. A exposição planejada soma 28 minutos; perguntas começam somente no último slide e ficam fora desse tempo.
+A apresentação executável em [`presentation/`](../../presentation/README.md) tem 16 slides e atende desenvolvedores e arquitetos que já trabalham com Apigee. A exposição planejada soma 28 minutos; perguntas começam somente no último slide e ficam fora desse tempo.
 
 ## Fonte de verdade
 
@@ -12,25 +12,31 @@ npm run generate:speaker-script --prefix presentation
 
 Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e `npm run validate --prefix presentation` falham quando ele diverge da fonte.
 
+## Objetivos e abordagem
+
+Sessão de aprofundamento, não treinamento inicial. Ao final, o participante deve conseguir explicar a ordem dos flows, justificar a posição e o escopo de policies de tráfego e identificar riscos de confiança, reuso e falhas. Use a experiência prévia da audiência: previsão curta, análise do XML e discussão de trade-offs. Os bundles compartilham o domínio de pedidos, mas são independentes e não cumulativos.
+
 ## Progressão e tempo
+
+Abertura e revisão (slides 1–8): 7 min; intermediário (9–10): 7 min; avançado (11): 4 min 30 s; implantação e guardrails (12–13): 3 min 30 s; demonstração (14): 4 min; conclusão (15): 2 min. Perguntas abertas permanecem no final.
 
 | # | Slide | Tempo |
 |---:|---|---:|
 | 1 | Google Cloud Apigee | 1 min |
 | 2 | Sobre mim | 45 s |
-| 3 | APIs crescem. A complexidade também. | 1 min 30 s |
-| 4 | Gateway executa. Management governa. | 1 min 40 s |
-| 5 | Uma fronteira entre consumidor e backend | 1 min 50 s |
-| 6 | Anatomia de um API Proxy no Apigee | 2 min |
-| 7 | Como os XMLs de um proxy Apigee se relacionam | 1 min 50 s |
-| 8 | Ciclo de execução dos Flows no Apigee | 2 min 30 s |
-| 9 | Autenticar, minimizar e contabilizar | 2 min 20 s |
-| 10 | KVM e múltiplos TargetEndpoints | 2 min 30 s |
-| 11 | Confiança, reuso e falhas explícitas | 2 min 30 s |
-| 12 | Terraform no ciclo de implantação | 2 min 20 s |
+| 3 | APIs crescem. A complexidade também. | 45 s |
+| 4 | Gateway executa. Management governa. | 40 s |
+| 5 | Uma fronteira entre consumidor e backend | 45 s |
+| 6 | Anatomia de um API Proxy no Apigee | 45 s |
+| 7 | Como os XMLs de um proxy Apigee se relacionam | 50 s |
+| 8 | Ciclo de execução dos Flows no Apigee | 1 min 30 s |
+| 9 | Autenticar, minimizar e contabilizar | 3 min 30 s |
+| 10 | KVM e múltiplos TargetEndpoints | 3 min 30 s |
+| 11 | Confiança, reuso e falhas explícitas | 4 min 30 s |
+| 12 | Terraform no ciclo de implantação | 2 min |
 | 13 | Guardrails arquiteturais | 1 min 30 s |
-| 14 | Demonstração: siga a evolução | 2 min 30 s |
-| 15 | Conclusão | 1 min 15 s |
+| 14 | Demonstração: siga a evolução | 4 min |
+| 15 | Conclusão | 2 min |
 | 16 | Perguntas? | fora da exposição |
 
 ## Pontos técnicos que não podem ser abreviados
@@ -53,13 +59,14 @@ Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e
 
 Os tempos indicam uma **janela para explicação, demonstração e transição**, não uma meta de palavras. Nas notas, **Abertura** e **Explicação principal** formam a fala essencial. **Contexto arquitetural** é material de aprofundamento seletivo; **Demonstração** orienta a navegação e não precisa ser lida integralmente.
 
-- Slide 2: apresentação pessoal breve, em 45 segundos, sem ler toda a biografia.
+- Slides 1–8: recapitulação de sete minutos, usando o material projetado sem abrir cada arquivo. Slide 2: apresentação pessoal breve em 45 segundos.
 - Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
 - Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
 - Slide 10: seguir KVM → validação → AssignMessage → RouteRules e enfatizar que a plataforma não é executada localmente.
-- Slide 11: priorizar a cadeia JWT → remoção do bearer → FlowCallout; falhas detalhadas ficam nas notas.
+- Slide 11: aprofundar a fronteira de confiança após remoção do bearer, autorização versus autenticação, compatibilidade de Shared Flows e categorias de falhas. Explicar que AssignMessage/Set sobrescreve o header de subject com o valor validado, mas não protege contra acesso direto ao backend; restrições de acesso e autenticação entre serviços estão fora do laboratório.
 - Slide 12: manter Terraform conceitual; não abrir um treinamento de HCL.
-- Slide 14: aproximadamente 30 s básico, 45 s intermediário, 40 s avançado e 35 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado.
+- Slide 14: 30 s básico, 75 s intermediário, 90 s avançado e 45 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado. As perguntas de previsão são pausas curtas incluídas nos tempos; discussões abertas ficam para o final. Se o terminal atrasar, use o guia aberto.
+- Slide 15: peça que cada participante identifique uma decisão aplicável a um proxy que mantém; retome os objetivos de aprendizagem.
 
 ## Ensaio e Speaker View
 

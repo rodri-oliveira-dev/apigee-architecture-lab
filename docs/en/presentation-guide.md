@@ -1,6 +1,6 @@
 # Presentation guide — 28 minutes + questions
 
-The executable Brazilian Portuguese deck under [`presentation/`](../../presentation/README.md) has 16 slides for developers and architects. The planned talk takes 28 minutes; Q&A starts on the final slide and is not part of that duration.
+The executable Brazilian Portuguese deck under [`presentation/`](../../presentation/README.md) has 16 slides for developers and architects who already work with Apigee. The planned talk takes 28 minutes; Q&A starts on the final slide and is not part of that duration.
 
 ## Sources of truth
 
@@ -12,7 +12,13 @@ npm run generate:speaker-script --prefix presentation
 
 Do not edit the generated script manually. Presentation build and validation fail when it differs from its source.
 
+## Learning objectives and approach
+
+This is a technical deep dive, not a beginner course. Participants should be able to explain flow order, justify the placement and scope of traffic policies, and identify trust, reuse, and fault-handling risks. Use short prediction questions followed by XML analysis and trade-off discussion. The orders domain ties together independent, non-cumulative bundles.
+
 ## Sequence
+
+Opening and fundamentals (slides 1–8): 7 min; intermediate (9–10): 7 min; advanced (11): 4 min 30 s; deployment and guardrails (12–13): 3 min 30 s; demonstration (14): 4 min; conclusion (15): 2 min. Open Q&A remains outside the talk.
 
 1. Google Cloud Apigee
 2. About the speaker
@@ -44,6 +50,10 @@ Do not edit the generated script manually. Presentation build and validation fai
 - FaultRules belong to the endpoint where the fault occurs; DefaultFaultRule is the fallback when no specific rule executes.
 - Static validation cannot replace Apigee import, deployment, Debug, or runtime testing.
 - Terraform remains conceptual: versioned bundle, official import/deployment resources, dependencies, environment promotion, and protected remote state.
+
+## Discussion prompts
+
+Ask whether an invalid key reaches SpikeArrest, whether two keys share a quota, what happens with an invalid KVM value, and how the backend can trust a forwarded subject after token removal. Authentication is not authorization. AssignMessage/Set replaces the incoming subject header after verification, but does not prevent direct backend access; production trust requires appropriate access restrictions and authenticated communication, neither of which is implemented here. Discuss Shared Flow compatibility and distinguish backend HTTP responses from transport and operational JWT/JWKS failures. Keep the examples explicitly static and do not present predictions as observed runtime behavior.
 
 ## Rehearsal and Speaker View
 

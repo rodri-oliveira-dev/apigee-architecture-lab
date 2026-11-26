@@ -8,15 +8,15 @@ A exposição planejada dura 28 minutos. O slide de perguntas fica fora desse te
 
 **Tempo estimado:** 1 min
 
-**Mensagem principal:** Esta sessão conecta conceitos de API Management a bundles XML reais e verificáveis.
+**Mensagem principal:** Revisitar fundamentos, aprofundar o comportamento das policies e avaliar decisões de arquitetura que aparecem no cotidiano de quem trabalha com Apigee.
 
 **Fala sugerida:**
 
-Olá! Hoje eu quero mostrar o Apigee por um ângulo bastante concreto: como decisões de arquitetura aparecem em arquivos que conseguimos ler, versionar e revisar.
+Olá! Como vocês já trabalham com Apigee, não vamos começar do zero. Vamos usar uma API de pedidos para revisar o modelo mental e investigar decisões que parecem simples até uma falha acontecer.
 
-Vamos evoluir uma API fictícia de pedidos do proxy mínimo até controles de acesso, tráfego, JWT, reuso e tratamento de falhas. O foco é a configuração declarativa do runtime; não vamos provisionar Google Cloud nem apresentar este laboratório como uma solução pronta para produção.
+Ao final, quero que vocês consigam explicar a ordem dos flows, justificar a posição e o escopo dos controles de tráfego, e identificar riscos de confiança, reuso e tratamento de falhas. Os exemplos são independentes e aumentam em complexidade conceitual; não são versões cumulativas nem uma solução pronta para produção.
 
-A proposta é aproximar duas perspectivas: para quem desenvolve, onde cada policy executa; para quem arquiteta, quais dependências e limites essa escolha cria.
+A sessão é uma conversa técnica baseada em bundles XML versionados. Não há provisionamento GCP nem execução de chamadas no runtime Apigee.
 
 **Arquivos demonstrados:** `README.md`, `examples/` e `presentation/slides.md`.
 
@@ -42,15 +42,15 @@ Fora do trabalho, gosto de filosofia, leitura, jogos retrô e de estar com minha
 
 ## 3. APIs crescem. A complexidade também.
 
-**Tempo estimado:** 1 min 30 s
+**Tempo estimado:** 45 s
 
 **Mensagem principal:** O crescimento das APIs transforma segurança, capacidade e evolução em responsabilidades arquiteturais compartilhadas.
 
 **Fala sugerida:**
 
-Pensem em uma API de pedidos que começou com um consumidor e um backend. O caminho parecia simples até surgirem outros canais, parceiros e requisitos de segurança.
+Vocês provavelmente reconhecem esses problemas: a API de pedidos ganha consumidores, tráfego e exigências de segurança. Qual desses desafios já aparece nas nossas revisões de código?
 
-Agora precisamos identificar a aplicação, talvez o usuário, proteger o backend contra rajadas, controlar consumo e manter um contrato estável enquanto o sistema interno muda. Se cada backend resolver isso de um jeito, criamos duplicação e respostas inconsistentes.
+O mesmo contrato precisa continuar estável enquanto crescem os controles de acesso, consumo e consistência. O objetivo é revisar as escolhas que fazemos na fronteira, não transferir a regra de negócio para ela.
 
 Uma fronteira administrada concentra preocupações transversais sem transformar o gateway no dono da regra de negócio. Isso melhora governança e desacoplamento, mas também exige clareza sobre o que pertence ao runtime e o que pertence ao ciclo de vida da API.
 
@@ -60,15 +60,15 @@ Uma fronteira administrada concentra preocupações transversais sem transformar
 
 ## 4. Gateway executa. Management governa.
 
-**Tempo estimado:** 1 min 40 s
+**Tempo estimado:** 40 s
 
 **Mensagem principal:** O gateway é uma parte do API Management; não devemos atribuir ao componente de execução toda a capacidade da plataforma.
 
 **Fala sugerida:**
 
-Aqui vale separar dois termos que muitas vezes aparecem como sinônimos, mas representam escopos diferentes.
+Relembremos uma distinção que faz diferença nas responsabilidades dos times.
 
-O gateway está no caminho da chamada: recebe a requisição, aplica as policies configuradas e decide o roteamento. API Management é mais amplo e inclui produtos de API, publicação, onboarding de aplicações, analytics, governança e ciclo de vida. O Apigee reúne essas capacidades, mas os XMLs deste repositório demonstram principalmente o runtime.
+O gateway recebe, aplica policies e roteia. API Management inclui também produtos, publicação, onboarding, analytics e ciclo de vida. Ter um proxy não significa que a API já está governada.
 
 Essa separação evita uma expectativa perigosa: instalar um gateway não cria governança automaticamente. Produtos, responsabilidades, observabilidade e processos de mudança continuam sendo decisões organizacionais.
 
@@ -78,7 +78,7 @@ Essa separação evita uma expectativa perigosa: instalar um gateway não cria g
 
 ## 5. Uma fronteira entre consumidor e backend
 
-**Tempo estimado:** 1 min 50 s
+**Tempo estimado:** 45 s
 
 **Mensagem principal:** O API Proxy cria uma fronteira programável sem substituir o backend nem esconder as dependências do ambiente.
 
@@ -86,11 +86,11 @@ Essa separação evita uma expectativa perigosa: instalar um gateway não cria g
 
 Vamos acompanhar uma chamada de pedidos da esquerda para a direita.
 
-O hostname associado ao environment group recebe a conexão. O ProxyEndpoint representa a interface voltada ao consumidor e executa seus flows. A RouteRule seleciona um TargetEndpoint, que encapsula a conexão com o backend. Policies entram nesses pipelines como Steps configurados.
+Sigam a requisição: hostname associado ao environment group, ProxyEndpoint, RouteRule, TargetEndpoint, backend. O contrato público e a conexão de saída têm responsabilidades distintas.
 
 Separar a interface pública da conexão de destino permite evoluir URL, TLS ou configuração do backend com menor impacto sobre consumidores. Isso é desacoplamento de contrato, não ausência de dependências.
 
-Abra `docs/pt-br/architecture.md` e mostre o primeiro Mermaid. Aponte que `orders-backend.example.invalid` é intencionalmente fictício; não existe integração funcional nem necessidade de autenticação GCP para ver os slides.
+Use o diagrama projetado; o destino .invalid é fictício. Deixe os arquivos para consulta posterior.
 
 **Arquivos demonstrados:** `docs/pt-br/architecture.md` e `examples/01-basic/apiproxy/targets/default.xml`.
 
@@ -98,7 +98,7 @@ Abra `docs/pt-br/architecture.md` e mostre o primeiro Mermaid. Aponte que `order
 
 ## 6. Anatomia de um API Proxy no Apigee
 
-**Tempo estimado:** 2 min
+**Tempo estimado:** 45 s
 
 **Mensagem principal:** Esta árvore é um exemplo de bundle XML tradicional do Apigee, não uma estrutura universal de API Gateways.
 
@@ -106,11 +106,11 @@ Abra `docs/pt-br/architecture.md` e mostre o primeiro Mermaid. Aponte que `order
 
 No repositório, essa arquitetura aparece como uma estrutura pequena e deliberadamente explícita.
 
-O descritor raiz identifica o proxy. `proxies/default.xml` define a interface e o roteamento; `targets/default.xml` define o destino. `policies/` só é necessário quando há policies, e `resources/` aparece quando scripts, JARs ou XSLT são usados. As listas `Policies`, `ProxyEndpoints` e `TargetEndpoints` no descritor são metadados opcionais, frequentemente gerados pela UI.
+Revisão rápida: descritor identifica o proxy, proxies/ guarda a interface, targets/ guarda o destino, policies/ e resources/ aparecem quando necessários. As listas do descritor são metadados opcionais. A árvore é a de um bundle XML tradicional.
 
 `manifests/` não é um diretório padrão da estrutura de bundle documentada pelo Apigee; por isso não adicionamos um diretório artificial. O laboratório escolhe arquivos XML versionados, mas proxies também podem ser criados e editados pela UI ou APIs da plataforma. A estrutura mostrada não deve ser generalizada para outros gateways.
 
-Abra `examples/01-basic/apiproxy/`. Mostre que o módulo básico não possui diretório de policies: ele expõe o esqueleto mínimo antes de acrescentarmos comportamento.
+Aponte a árvore no slide; não abra arquivos nesta etapa.
 
 **Arquivos demonstrados:** `examples/01-basic/apiproxy/orders-basic.xml`, `examples/01-basic/apiproxy/proxies/default.xml` e `examples/01-basic/apiproxy/targets/default.xml`.
 
@@ -118,7 +118,7 @@ Abra `examples/01-basic/apiproxy/`. Mostre que o módulo básico não possui dir
 
 ## 7. Como os XMLs de um proxy Apigee se relacionam
 
-**Tempo estimado:** 1 min 50 s
+**Tempo estimado:** 50 s
 
 **Mensagem principal:** A configuração é declarativa, mas possui dependências referenciais que o repositório consegue validar estaticamente.
 
@@ -130,7 +130,7 @@ Neste trecho curto existem duas decisões diferentes: como o consumidor chama a 
 
 Referências por nome ajudam no desacoplamento, mas falhas de digitação só aparecem cedo se forem validadas. O script local verifica essa relação, além de Steps e FlowCallouts, sem alegar equivalência ao schema completo da plataforma.
 
-O trecho na tela é extraído de `examples/01-basic/apiproxy/proxies/default.xml` durante o build. Abra também o TargetEndpoint e compare `name="default"`.
+Use o XML já projetado: o nome referenciado em RouteRule deve corresponder ao TargetEndpoint. A comparação completa fica disponível no link.
 
 **Arquivos demonstrados:** `examples/01-basic/apiproxy/proxies/default.xml`, `examples/01-basic/apiproxy/targets/default.xml` e `scripts/validate_bundles.py`.
 
@@ -138,59 +138,59 @@ O trecho na tela é extraído de `examples/01-basic/apiproxy/proxies/default.xml
 
 ## 8. Ciclo de execução dos Flows no Apigee
 
-**Tempo estimado:** 2 min 30 s
+**Tempo estimado:** 1 min 30 s
 
 **Mensagem principal:** A resposta percorre os endpoints em ordem inversa, mas a execução interna continua PreFlow, primeiro Conditional Flow compatível e PostFlow.
 
 **Fala sugerida:**
 
-Leia o diagrama em duas camadas: entre os endpoints e dentro de cada endpoint.
+Na volta do backend, a ordem PreFlow, Conditional Flow e PostFlow também se inverte? Pensem por alguns segundos antes de seguir as setas.
 
 No request, o ProxyEndpoint executa antes do TargetEndpoint. No response, a ordem entre eles se inverte. Dentro de cada pipeline, em qualquer sentido, a sequência continua PreFlow, primeiro Conditional Flow compatível e PostFlow. Cada flow executa seus Steps na ordem declarada.
 
 A posição determina quais variáveis estão disponíveis. Não devemos inverter a ordem interna na resposta; e uma falha que interrompe a execução normal segue para tratamento de erros, não para os próximos Steps.
 
-Siga as setas em `docs/pt-br/architecture.md`. Depois mostre `list-orders` no proxy intermediário: o Conditional Flow de `GET /` apenas adiciona `x-api-operation`, sem lógica de negócio.
+Resposta: não. Só a ordem entre endpoints se inverte. Use o diagrama e destaque a primeira condição compatível; o exemplo list-orders acrescenta contexto técnico apenas ao GET /.
 
 **Arquivos demonstrados:** `docs/pt-br/architecture.md` e `examples/02-intermediate/apiproxy/proxies/default.xml`.
 
-**Transição:** Com isso em mente, vamos analisar a sequência das policies.
+**Transição:** Com o modelo mental alinhado, vamos questionar decisões do pipeline intermediário.
 
 ## 9. Autenticar, minimizar e contabilizar
 
-**Tempo estimado:** 2 min 20 s
+**Tempo estimado:** 3 min 30 s
 
 **Mensagem principal:** SpikeArrest limita rajadas; Quota controla consumo por credencial. A ordem das policies define quais chamadas chegam a cada controle.
 
 **Fala sugerida:**
 
-SpikeArrest e Quota resolvem problemas diferentes. E a ordem das policies importa.
+Uma chave inválida chega ao SpikeArrest neste pipeline? E duas chaves da mesma aplicação compartilham a mesma quota? Façam uma previsão antes de olharmos o XML.
 
 `VerifyAPIKey` valida `x-api-key` e disponibiliza variáveis da chave. Removemos o header antes do roteamento. Depois, `SpikeArrest` limita rajadas do proxy a `10ps` em janela deslizante regional; `Quota` permite 100 chamadas por minuto para cada consumer key, em janela móvel. Por último, adicionamos correlação.
 
 Aqui, `client_id` contém a própria chave, não o identificador lógico da aplicação: duas chaves têm contadores distintos. Como a verificação vem antes do SpikeArrest, chaves inválidas falham antes de alcançar essa policy. Portanto, ela não limita essas tentativas neste desenho. Proteger a borda antes da verificação exigiria outro controle. Os números são didáticos.
 
-Mostre o PreFlow intermediário, a taxa em `spike-arrest.xml` e o `Identifier` em `quota.xml`. Compare proteção contra rajadas com governança de consumo; a seguir, aponte o Conditional Flow `list-orders`.
+A resposta é não nos dois casos. Mostre o PreFlow e o Identifier da Quota. Compare a ordem atual com um controle de borda anterior à autenticação, sem propor uma ordem universal: proteger capacidade cedo e contabilizar somente credenciais válidas são objetivos distintos. Uma rotação de chave cria outro contador neste exemplo. Reserve uma pausa curta para a audiência justificar a escolha.
 
 **Arquivos demonstrados:** `examples/02-intermediate/apiproxy/proxies/default.xml`, `verify-api-key.xml`, `remove-api-key.xml`, `quota.xml` e `assign-list-orders-context.xml`.
 
-**Transição:** Antes do avançado, vamos externalizar uma decisão não sensível e usá-la para escolher entre dois destinos.
+**Transição:** Além de controlar quem chama e quanto consome, precisamos decidir para onde encaminhar uma chamada sem alterar o contrato público.
 
 ## 10. KVM e múltiplos TargetEndpoints
 
-**Tempo estimado:** 2 min 30 s
+**Tempo estimado:** 3 min 30 s
 
 **Mensagem principal:** Uma KVM pode externalizar configuração; RouteRules ordenadas selecionam TargetEndpoints sem alterar o contrato público.
 
 **Fala sugerida:**
 
-Esta extensão é independente do proxy intermediário principal e mantém o BasePath estável enquanto escolhe um backend fictício.
+Se a configuração da KVM contiver um valor inesperado, queremos encaminhar ao backend padrão ou sinalizar uma falha? Neste cenário, a extensão orders-routing demonstra a segunda escolha; é um bundle independente.
 
 `get-backend-region` lê a chave não sensível `backend-region` da KVM de environment `orders-routing-config` para `private.lab.backend.region`. A leitura continua somente até uma RaiseFault controlada quando a KVM/entrada falha, está ausente ou contém valor diferente de `primary` e `secondary`. Só então AssignMessage adiciona o contexto técnico. A RouteRule condicional para `secondary` vem primeiro; a regra sem condição para `primary` é o fallback final.
 
 RouteRules são avaliadas de cima para baixo e a primeira compatível vence. A validação anterior impede que uma configuração inválida caia silenciosamente no fallback. A KVM e a entrada não são criadas pelo bundle; sem uma organização e um environment provisionados, este repositório só valida a estrutura. No Apigee atual, KVMs são criptografadas, e `private.` impede exposição do valor em Debug. KVM não é obrigatória nem substitui um cofre de segredos.
 
-Compare os TargetEndpoints `primary.xml` e `secondary.xml`. Mostre a condição opcional do Step de AssignMessage e destaque que nenhum hostname aparece no contrato público.
+Peça que prevejam o resultado de primary, secondary e um valor inválido. Mostre as RouteRules: secondary escolhe o destino alternativo, primary usa o fallback e valor inválido interrompe antes do roteamento. Discuta quem governa alterações da KVM e por que fallback não deve mascarar configuração incorreta.
 
 **Arquivos demonstrados:** `examples/02-intermediate/orders-routing/apiproxy/` e `examples/02-intermediate/README.md`.
 
@@ -198,19 +198,19 @@ Compare os TargetEndpoints `primary.xml` e `secondary.xml`. Mostre a condição 
 
 ## 11. Confiança, reuso e falhas explícitas
 
-**Tempo estimado:** 2 min 30 s
+**Tempo estimado:** 4 min 30 s
 
 **Mensagem principal:** O caminho principal valida o JWT, remove o bearer token e reutiliza apenas o contexto necessário; falhas exigem tratamento específico.
 
 **Fala sugerida:**
 
-No avançado, o foco é a cadeia de confiança e o que enviamos ao backend.
+Se o gateway valida o token e envia somente o subject, o que impede uma chamada direta ao backend de forjar esse header? Esse é o problema de confiança que precisamos resolver além da policy.
 
 `VerifyJWT` verifica RS256, issuer, audience e os claims exigidos usando o JWKS em `private.orders.jwks`. Depois retiramos `Authorization`. O `FlowCallout` invoca `orders-security-shared`, que propaga apenas o subject validado.
 
-`JWT.failed` pode indicar erro do token ou problema operacional de chave/configuração. Este exemplo simplifica tudo em 401; produção precisa distinguir e monitorar falhas de JWKS. Outras falhas locais do proxy usam 500; falhas de conexão ao target, 502; respostas HTTP 4xx/5xx do backend preservam o status e recebem corpo sanitizado. O Shared Flow precisa estar implantado primeiro no mesmo environment.
+Validar assinatura, issuer e audience não substitui autorização por operação ou recurso. O Shared Flow usa Set em AssignMessage para substituir qualquer valor recebido em `x-authenticated-subject` pelo subject validado no caminho normal após VerifyJWT. Isso não impede acesso direto ao backend: restrições de acesso e autenticação entre serviços adequadas ao threat model são necessárias para confiar na origem e integridade do contexto, mas não estão implementadas no laboratório. Shared Flow reduz duplicação, mas amplia o raio de impacto de uma mudança e exige gestão de compatibilidade e implantação prévia no mesmo environment. JWT.failed agrupa falhas do token e falhas operacionais de chave/configuração em 401 no exemplo; produção deve distingui-las e monitorá-las. Outras falhas locais usam 500; falhas de conexão sem resposta HTTP usam 502; respostas HTTP 4xx/5xx preservam status e recebem corpo sanitizado. Nenhum desses controles adicionais de produção é implantado pelo laboratório.
 
-Mostre `verify-jwt → remove-authorization → call-shared-security`. Deixe a matriz de falhas nas notas e abra `targets/default.xml` somente se surgir dúvida.
+Mostre a cadeia verify-jwt, remove-authorization e call-shared-security. Pergunte como diferenciar um token inválido de uma indisponibilidade operacional de JWKS e uma falha de transporte de um 404 retornado pelo backend. Aponte a separação entre FaultRules do proxy e do target; não trate o 401 didático como contrato universal.
 
 **Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml`, `verify-jwt.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
 
@@ -218,19 +218,19 @@ Mostre `verify-jwt → remove-authorization → call-shared-security`. Deixe a m
 
 ## 12. Terraform no ciclo de implantação
 
-**Tempo estimado:** 2 min 20 s
+**Tempo estimado:** 2 min
 
 **Mensagem principal:** O bundle versionado é um artefato; Terraform pode importar sua revisão e implantá-la por environment sem misturar todas as responsabilidades.
 
 **Fala sugerida:**
 
-Infrastructure as Code entra depois que o bundle já pode ser revisado e validado.
+Uma alteração de Shared Flow pode afetar vários proxies. Como promover revisões e testar dependências sem transformar o deploy em tentativa e erro?
 
 Um pipeline gera um ZIP determinístico, registra hash e versão, usa o recurso oficial `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. Depois, aguarda com timeout até o status da revisão ficar `READY` antes dos testes. Módulos reutilizáveis podem reduzir repetição, desde que entradas e dependências permaneçam explícitas.
 
 Shared Flow, KVM e environment podem criar ordem de implantação. Como o deployment é eventualmente consistente, o readiness check consulta a revisão específica, avança em `READY`, falha em `ERROR` e termina ao atingir o limite; só então começam Debug e testes de runtime num environment não produtivo. Estado remoto exige criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. O laboratório não inclui interfaces privadas, credenciais, backend de estado ou código Terraform executável.
 
-Mostre o Mermaid e abra a documentação apenas se houver pergunta sobre provider. Destaque que os nomes dos dois recursos são públicos e oficialmente documentados; a estratégia de módulos é uma decisão de cada organização.
+Use o diagrama para destacar revisão, dependências, readiness e testes; não abra HCL. O laboratório não cria recursos nem executa Terraform.
 
 **Arquivos demonstrados:** `docs/pt-br/deployment-lifecycle.md` e `docs/en/deployment-lifecycle.md`.
 
@@ -244,7 +244,7 @@ Mostre o Mermaid e abra a documentação apenas se houver pergunta sobre provide
 
 **Fala sugerida:**
 
-Quatro critérios ajudam a revisar esta integração.
+Transformem os quatro critérios em perguntas de revisão de PR: onde a falha interrompe o fluxo, quem possui o contrato, quem depende do reuso e qual evidência o teste fornece?
 
 Policies de segurança devem interromper a execução normal ao falhar. Interface pública e conexão com o target têm responsabilidades diferentes. Shared Flow reduz duplicação, mas cria dependência de implantação. E os testes precisam declarar claramente o que conseguem validar.
 
@@ -258,19 +258,19 @@ Relacione os critérios com `docs/pt-br/architectural-decisions.md` e os limites
 
 ## 14. Demonstração: siga a evolução
 
-**Tempo estimado:** 2 min 30 s
+**Tempo estimado:** 4 min
 
 **Mensagem principal:** O roteiro offline relaciona requisições HTTP, policies e resultados condicionais sem simular o Apigee.
 
 **Fala sugerida:**
 
-Vamos percorrer três requisições hipotéticas e localizar nos XMLs as decisões que influenciam o resultado.
+Vamos consolidar com três previsões: qual destino é selecionado, qual controle não é alcançado e qual categoria de falha deve ser tratada.
 
 No básico, o BasePath e a RouteRule mostram o caminho até um backend fictício. No intermediário, a chave inválida gera uma falha padrão da VerifyAPIKey; com chave válida, SpikeArrest e Quota passam a controlar o tráfego. No avançado, a FaultRule configura JWT.failed como 401 e a falha de conexão ao target como 502. O demonstrador offline lê essas configurações, sem emitir requisições HTTP.
 
 Os resultados dependem do runtime e de recursos externos. Não mostramos HTTP 200 porque o backend é fictício. O código offline não é um emulador Apigee; o validador confirma apenas XML e referências locais.
 
-Deixe abertos `docs/pt-br/http-scenarios.md` e os ProxyEndpoints. Reserve 30 segundos para BasePath e RouteRule, 45 segundos para a chave inválida e os limites condicionais 429, e 40 segundos para JWT.failed → 401 e falha do target → 502. Nos 35 segundos finais, execute os comandos do slide. O cenário de backend 404 sanitizado fica para perguntas. Não execute `curl` para `.invalid`.
+Deixe abertos docs/pt-br/http-scenarios.md e os ProxyEndpoints. Use 30 segundos para BasePath e RouteRule; 75 segundos para a chave inválida, quota por chave e 429 condicionais; 90 segundos para JWT.failed → 401, target sem resposta → 502 e backend 404 sanitizado. Use os 45 segundos finais para os dois comandos. Peça previsões antes de revelar o comportamento configurado. Se o terminal atrasar, use o guia de cenários já aberto. Não execute curl para .invalid.
 
 **Arquivos demonstrados:** `docs/pt-br/http-scenarios.md`, `scripts/demo_http_scenarios.py`, `scripts/validate_bundles.py`, `examples/01-basic/`, `examples/02-intermediate/` e `examples/03-advanced/`.
 
@@ -278,15 +278,15 @@ Deixe abertos `docs/pt-br/http-scenarios.md` e os ProxyEndpoints. Reserve 30 seg
 
 ## 15. Uma API bem gerenciada torna decisões explícitas.
 
-**Tempo estimado:** 1 min 15 s
+**Tempo estimado:** 2 min
 
 **Mensagem principal:** Apigee torna a fronteira programável; qualidade vem da intenção explícita, das dependências visíveis e da validação proporcional ao risco.
 
 **Fala sugerida:**
 
-Uma API bem gerenciada deixa decisões importantes visíveis.
+Para concluir, pensem em um proxy que vocês mantêm hoje: qual decisão de pipeline, segurança ou tratamento de falha merece ser revisitada?
 
-Vimos a fronteira entre interface e destino, a ordem dos flows e como segurança, limites e reuso aparecem em XMLs versionáveis. O laboratório demonstra configuração declarativa, não garante comportamento produtivo.
+Retomem os três objetivos: explicar a ordem dos flows; justificar a posição e o escopo dos controles; identificar riscos de confiança, reuso e falhas. Cada um deve conseguir apontar uma decisão concreta no próprio contexto. Os exemplos são configuração declarativa e evidência estática, não garantia de comportamento produtivo.
 
 Em uma implantação real, o próximo passo seria testar sucessos e falhas num ambiente de teste, medir limites e definir operação de chaves, logs e rollout.
 
