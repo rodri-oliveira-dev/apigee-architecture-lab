@@ -63,7 +63,7 @@ Os tempos indicam uma **janela para explicação, demonstração e transição**
 - Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
 - Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
 - Slide 10: seguir KVM → validação → AssignMessage → RouteRules e enfatizar que a plataforma não é executada localmente.
-- Slide 11: aprofundar a fronteira de confiança após remoção do bearer, autorização versus autenticação, compatibilidade de Shared Flows e categorias de falhas. Não pressupor que o backend confia em um header apenas por ele ter sido gerado pelo gateway.
+- Slide 11: aprofundar a fronteira de confiança após remoção do bearer, autorização versus autenticação, compatibilidade de Shared Flows e categorias de falhas. Explicar que AssignMessage/Set sobrescreve o header de subject com o valor validado, mas não protege contra acesso direto ao backend; restrições de acesso e autenticação entre serviços estão fora do laboratório.
 - Slide 12: manter Terraform conceitual; não abrir um treinamento de HCL.
 - Slide 14: 30 s básico, 75 s intermediário, 90 s avançado e 45 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado. As perguntas de previsão são pausas curtas incluídas nos tempos; discussões abertas ficam para o final. Se o terminal atrasar, use o guia aberto.
 - Slide 15: peça que cada participante identifique uma decisão aplicável a um proxy que mantém; retome os objetivos de aprendizagem.
