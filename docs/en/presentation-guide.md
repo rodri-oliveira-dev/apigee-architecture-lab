@@ -53,7 +53,7 @@ Opening and fundamentals (slides 1–8): 7 min; intermediate (9–10): 7 min; ad
 
 ## Discussion prompts
 
-Ask whether an invalid key reaches SpikeArrest, whether two keys share a quota, what happens with an invalid KVM value, and how the backend can trust a forwarded subject after token removal. Authentication is not authorization; production trust requires appropriate access restrictions and authenticated communication. Discuss Shared Flow compatibility and distinguish backend HTTP responses from transport and operational JWT/JWKS failures. Keep the examples explicitly static and do not present predictions as observed runtime behavior.
+Ask whether an invalid key reaches SpikeArrest, whether two keys share a quota, what happens with an invalid KVM value, and how the backend can trust a forwarded subject after token removal. Authentication is not authorization. AssignMessage/Set replaces the incoming subject header after verification, but does not prevent direct backend access; production trust requires appropriate access restrictions and authenticated communication, neither of which is implemented here. Discuss Shared Flow compatibility and distinguish backend HTTP responses from transport and operational JWT/JWKS failures. Keep the examples explicitly static and do not present predictions as observed runtime behavior.
 
 ## Rehearsal and Speaker View
 
