@@ -26,7 +26,7 @@ The `ProxyEndpoint` defines the consumer-facing interface and inbound/outbound f
 | [02 — Intermediate](examples/02-intermediate/README.md) | API key, traffic, KVM, and multiple TargetEndpoints | Requires product/app/key and KVM in Apigee |
 | [03 — Advanced](examples/03-advanced/README.md) | JWT, Shared Flow, FlowCallout, FaultRules | Requires JWKS private variable and ordered deployment |
 
-Follow the numeric order. Compare each module's `PreFlow` to see the policy chain grow, and use the [presentation guide](docs/en/presentation-guide.md) for a 30-minute session.
+Follow the numeric order: revisit fundamentals, deepen intermediate decisions, and examine advanced trade-offs. Bundles are independent, not cumulative. Compare their `PreFlow` sections and use the [presentation guide](docs/en/presentation-guide.md) for a 28-minute session followed by Q&A, aimed at practitioners already working with Apigee.
 
 The independent `orders-routing` bundle under the intermediate module retrieves a non-sensitive KVM value, validates it, enriches the message, and selects one of two TargetEndpoints. The KVM is neither created nor accessed locally. The [deployment lifecycle guide](docs/en/deployment-lifecycle.md) places versioned bundles, reusable modules, dependencies, and remote state in a Terraform strategy without inventing private interfaces or performing a deployment.
 
