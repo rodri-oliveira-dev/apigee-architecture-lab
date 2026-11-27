@@ -18,17 +18,17 @@
 </div>
 
 Notas:
-**Mensagem principal:** Revisitar fundamentos, aprofundar o comportamento das policies e avaliar decisões de arquitetura que aparecem no cotidiano de quem trabalha com Apigee.
+**Mensagem principal:** Esta sessão usa bundles XML reais para revisitar fundamentos e tornar decisões de arquitetura do Apigee concretas e discutíveis.
 
-**Abertura:** Olá! Como vocês já trabalham com Apigee, não vamos começar do zero. Vamos usar uma API de pedidos para revisar o modelo mental e investigar decisões que parecem simples até uma falha acontecer.
+**Abertura:** Olá! Quero começar com uma pergunta simples: quando dizemos que uma API está bem gerenciada, onde essa intenção aparece de verdade? Como vocês já trabalham com Apigee, não vamos começar do zero. Vamos investigar decisões que parecem simples até uma falha acontecer. [pausa breve]
 
-**Explicação principal:** Ao final, quero que vocês consigam explicar a ordem dos flows, justificar a posição e o escopo dos controles de tráfego, e identificar riscos de confiança, reuso e tratamento de falhas. Os exemplos são independentes e aumentam em complexidade conceitual; não são versões cumulativas nem uma solução pronta para produção.
+**Explicação principal:** Vamos acompanhar exemplos independentes de uma API fictícia de pedidos, do proxy mínimo aos controles de tráfego, JWT, reuso e tratamento de falhas. Ao final, quero que vocês consigam explicar a ordem dos flows, justificar a posição e o escopo dos controles e identificar riscos de confiança e implantação. Os exemplos aumentam em complexidade conceitual; não são versões cumulativas nem uma solução pronta para produção.
 
-**Contexto arquitetural:** A sessão é uma conversa técnica baseada em bundles XML versionados. Não há provisionamento GCP nem execução de chamadas no runtime Apigee.
+**Contexto arquitetural:** A conversa parte de bundles XML versionados e aproxima duas perspectivas: onde cada policy executa e quais dependências, limites e custos operacionais essa escolha cria. Não há provisionamento GCP nem execução de chamadas no runtime Apigee.
 
 **Arquivos demonstrados:** `README.md`, `examples/` e `presentation/slides.md`.
 
-**Transição:** Antes de entrar no problema das APIs, quero me apresentar rapidamente e explicar de onde vem esse recorte.
+**Transição:** Antes de seguir essa API, vale explicar rapidamente de onde vem o olhar que vou usar nesta conversa.
 
 ---
 
@@ -56,17 +56,17 @@ Notas:
 </div>
 
 Notas:
-**Mensagem principal:** Mais de 20 anos de experiência em software e sistemas distribuídos orientam minha leitura prática do Apigee e da governança de APIs.
+**Mensagem principal:** Minha experiência com software corporativo e sistemas distribuídos orienta uma leitura prática, e não promocional, do Apigee.
 
-**Abertura:** Sou Rodrigo de Oliveira, arquiteto de software, com mais de 20 anos de experiência em sistemas corporativos.
+**Abertura:** Eu sou Rodrigo de Oliveira. Trabalho com desenvolvimento e arquitetura de software há mais de 20 anos, principalmente em sistemas corporativos.
 
-**Explicação principal:** Minha trajetória passa por .NET, backend, integrações e sistemas distribuídos. Hoje trabalho com desenho de soluções, revisão técnica e padrões de engenharia. É desse ponto de vista que proponho olhar para o Apigee: uma fronteira entre sistemas, não apenas um produto.
+**Explicação principal:** Minha trajetória passa por .NET, backend, integrações e sistemas distribuídos. Hoje atuo no desenho de soluções, em revisões técnicas e na definição de padrões com times de engenharia. É desse lugar que proponho olhar para o Apigee: como uma fronteira entre sistemas e responsabilidades, não apenas como um produto com uma lista de recursos.
 
-**Contexto arquitetural:** Fora do trabalho, gosto de filosofia, leitura, jogos retrô e de estar com minha família e meus gatos.
+**Contexto arquitetural:** Fora do trabalho, gosto de filosofia, leitura, jogos retrô, um bom café e tempo com minha família e meus gatos. Agora podemos voltar a um problema que provavelmente é familiar para muita gente aqui.
 
 **Arquivos demonstrados:** Nenhum; foto, descrição profissional e interesses foram adaptados do meu portfólio público, disponível no próprio slide.
 
-**Transição:** Agora, por que essa fronteira precisa ser administrada?
+**Transição:** Se essa fronteira fica entre tantos sistemas e interesses, por que apenas rotear chamadas deixa de ser suficiente?
 
 ---
 
@@ -86,15 +86,15 @@ Notas:
 Notas:
 **Mensagem principal:** O crescimento das APIs transforma segurança, capacidade e evolução em responsabilidades arquiteturais compartilhadas.
 
-**Abertura:** Vocês provavelmente reconhecem esses problemas: a API de pedidos ganha consumidores, tráfego e exigências de segurança. Qual desses desafios já aparece nas nossas revisões de código?
+**Abertura:** Pensem numa API de pedidos que nasceu para um consumidor e um backend. No início, o desenho cabe quase inteiro numa seta. Então chegam novos canais, parceiros, mais tráfego e exigências de segurança. Qual desses desafios já aparece nas revisões de vocês?
 
-**Explicação principal:** O mesmo contrato precisa continuar estável enquanto crescem os controles de acesso, consumo e consistência. O objetivo é revisar as escolhas que fazemos na fronteira, não transferir a regra de negócio para ela.
+**Explicação principal:** O contrato precisa continuar estável enquanto crescem os controles de acesso, consumo e consistência. A pergunta deixa de ser apenas “para onde essa chamada vai?” e passa a ser “quais garantias acompanham essa chamada?”. O objetivo é revisar as escolhas feitas nessa fronteira, sem transferir para ela a regra de negócio.
 
-**Contexto arquitetural:** Uma fronteira administrada concentra preocupações transversais sem transformar o gateway no dono da regra de negócio. Isso melhora governança e desacoplamento, mas também exige clareza sobre o que pertence ao runtime e o que pertence ao ciclo de vida da API.
+**Contexto arquitetural:** Uma fronteira administrada pode concentrar preocupações transversais sem transformar o gateway no dono da regra de negócio. Esse limite é importante. Centralizar tudo seria tão problemático quanto duplicar tudo. A arquitetura precisa decidir o que pertence ao runtime e o que pertence ao ciclo de vida mais amplo da API.
 
 **Arquivos demonstrados:** `README.md`, seção “API Gateway e API Management”.
 
-**Transição:** Essa distinção nos leva diretamente à diferença entre executar uma chamada e governar uma API ao longo do tempo.
+**Transição:** Essa diferença entre acompanhar uma chamada e cuidar da API ao longo do tempo nos leva a dois termos que costumam ser misturados.
 
 ---
 
@@ -121,15 +121,15 @@ Notas:
 Notas:
 **Mensagem principal:** O gateway é uma parte do API Management; não devemos atribuir ao componente de execução toda a capacidade da plataforma.
 
-**Abertura:** Relembremos uma distinção que faz diferença nas responsabilidades dos times.
+**Abertura:** Gateway e API Management aparecem muitas vezes como sinônimos. Eles se relacionam, mas não têm o mesmo alcance.
 
-**Explicação principal:** O gateway recebe, aplica policies e roteia. API Management inclui também produtos, publicação, onboarding, analytics e ciclo de vida. Ter um proxy não significa que a API já está governada.
+**Explicação principal:** O gateway participa do caminho da chamada. Ele recebe a requisição, aplica as policies configuradas e decide o roteamento. API Management olha também para o que existe ao redor desse caminho: produtos de API, publicação, onboarding de aplicações, analytics, governança e evolução. O Apigee reúne essas capacidades, mas os XMLs deste laboratório mostram principalmente o runtime.
 
-**Contexto arquitetural:** Essa separação evita uma expectativa perigosa: instalar um gateway não cria governança automaticamente. Produtos, responsabilidades, observabilidade e processos de mudança continuam sendo decisões organizacionais.
+**Contexto arquitetural:** Por que insistir nessa separação? Porque colocar um gateway no ambiente não cria governança por si só. Ainda precisamos definir produtos, responsabilidades, observabilidade e processos de mudança. A ferramenta oferece mecanismos; a organização continua responsável pelas decisões.
 
 **Arquivos demonstrados:** `README.md` e `README.en.md`, seção de gateway versus management.
 
-**Transição:** Com o escopo alinhado, podemos enxergar onde o proxy entra entre o consumidor e o backend.
+**Transição:** Com esse escopo claro, podemos voltar à nossa chamada e localizar o papel específico do proxy entre consumidor e backend.
 
 ---
 
@@ -152,17 +152,17 @@ Notas:
 Notas:
 **Mensagem principal:** O API Proxy cria uma fronteira programável sem substituir o backend nem esconder as dependências do ambiente.
 
-**Abertura:** Vamos acompanhar uma chamada de pedidos da esquerda para a direita.
+**Abertura:** Vamos seguir uma chamada de pedidos da esquerda para a direita. O desenho é simples, mas cada bloco responde a uma pergunta diferente.
 
-**Explicação principal:** Sigam a requisição: hostname associado ao environment group, ProxyEndpoint, RouteRule, TargetEndpoint, backend. O contrato público e a conexão de saída têm responsabilidades distintas.
+**Explicação principal:** Primeiro, o hostname associado ao environment group recebe a conexão. O ProxyEndpoint representa a interface voltada ao consumidor e executa seus flows. Depois, uma RouteRule escolhe um TargetEndpoint, que encapsula a conexão com o backend. As policies participam desses pipelines como Steps configurados. Percebam que o proxy não substitui o backend. Ele organiza a passagem até ele.
 
-**Contexto arquitetural:** Separar a interface pública da conexão de destino permite evoluir URL, TLS ou configuração do backend com menor impacto sobre consumidores. Isso é desacoplamento de contrato, não ausência de dependências.
+**Contexto arquitetural:** Separar interface pública e conexão de destino permite mudar URL, TLS ou configuração do backend com menos impacto sobre os consumidores. Mas desacoplamento não significa ausência de dependências. O ambiente, o target e as credenciais continuam existindo; apenas deixamos essas relações explícitas no lugar adequado.
 
-**Demonstração:** Use o diagrama projetado; o destino .invalid é fictício. Deixe os arquivos para consulta posterior.
+**Demonstração:** Percorra o Mermaid da esquerda para a direita. Ao chegar ao target, mencione que o destino `.invalid` é fictício. Use apenas o diagrama projetado e deixe os arquivos para consulta posterior.
 
 **Arquivos demonstrados:** `docs/pt-br/architecture.md` e `examples/01-basic/apiproxy/targets/default.xml`.
 
-**Transição:** Agora vamos abrir essa fronteira e localizar as peças que formam um bundle implantável.
+**Transição:** O diagrama mostra responsabilidades. Para entender como elas se tornam configuração, precisamos abrir essa caixa e olhar o bundle.
 
 ---
 
@@ -197,17 +197,17 @@ apiproxy/
 Notas:
 **Mensagem principal:** Esta árvore é um exemplo de bundle XML tradicional do Apigee, não uma estrutura universal de API Gateways.
 
-**Abertura:** No repositório, essa arquitetura aparece como uma estrutura pequena e deliberadamente explícita.
+**Abertura:** No repositório, aquela arquitetura aparece como uma árvore pequena e deliberadamente explícita. Vamos localizar cada responsabilidade antes de acrescentar comportamento.
 
-**Explicação principal:** Revisão rápida: descritor identifica o proxy, proxies/ guarda a interface, targets/ guarda o destino, policies/ e resources/ aparecem quando necessários. As listas do descritor são metadados opcionais. A árvore é a de um bundle XML tradicional.
+**Explicação principal:** Revisão rápida: o descritor identifica o proxy, `proxies/` guarda a interface e o roteamento, e `targets/` guarda o destino. `policies/` e `resources/` aparecem quando necessários. As listas do descritor são metadados opcionais. Esta é a árvore de um bundle XML tradicional do Apigee.
 
-**Contexto arquitetural:** `manifests/` não é um diretório padrão da estrutura de bundle documentada pelo Apigee; por isso não adicionamos um diretório artificial. O laboratório escolhe arquivos XML versionados, mas proxies também podem ser criados e editados pela UI ou APIs da plataforma. A estrutura mostrada não deve ser generalizada para outros gateways.
+**Contexto arquitetural:** Há dois cuidados aqui. Primeiro, `manifests/` não faz parte da estrutura padrão de bundle documentada pelo Apigee, então não criamos uma pasta artificial. Segundo, esta é a estrutura tradicional de um bundle XML do Apigee, não um modelo universal para gateways. O laboratório privilegia XMLs versionados, embora a plataforma também permita autoria pela interface e por APIs.
 
 **Demonstração:** Aponte a árvore no slide; não abra arquivos nesta etapa.
 
 **Arquivos demonstrados:** `examples/01-basic/apiproxy/orders-basic.xml`, `examples/01-basic/apiproxy/proxies/default.xml` e `examples/01-basic/apiproxy/targets/default.xml`.
 
-**Transição:** A estrutura fica mais clara quando seguimos uma referência concreta de um XML ao outro.
+**Transição:** Conhecer as pastas ajuda, mas o ponto mais interessante está nas referências que conectam um XML ao outro.
 
 ---
 
@@ -235,17 +235,17 @@ Notas:
 Notas:
 **Mensagem principal:** A configuração é declarativa, mas possui dependências referenciais que o repositório consegue validar estaticamente.
 
-**Abertura:** Neste trecho curto existem duas decisões diferentes: como o consumidor chama a API e para onde o proxy encaminha a mensagem.
+**Abertura:** Neste trecho curto convivem duas decisões: como o consumidor chama a API e para onde o proxy encaminha a mensagem. Vale não confundir as duas.
 
-**Explicação principal:** `BasePath` participa do contrato público. A RouteRule aponta para o TargetEndpoint chamado `default`; esse valor precisa corresponder ao atributo `name` no XML do target. É essa indireção que mantém a URL do backend fora da interface pública.
+**Explicação principal:** O `BasePath` participa do contrato público. Já a RouteRule aponta para o TargetEndpoint chamado `default`, e esse nome precisa corresponder ao atributo `name` no XML do target. Parece apenas uma referência, mas ela cria uma separação útil: o consumidor conhece o caminho público; a conexão com o backend fica encapsulada no target.
 
-**Contexto arquitetural:** Referências por nome ajudam no desacoplamento, mas falhas de digitação só aparecem cedo se forem validadas. O script local verifica essa relação, além de Steps e FlowCallouts, sem alegar equivalência ao schema completo da plataforma.
+**Contexto arquitetural:** Referências por nome ajudam no desacoplamento, mas também abrem espaço para erros silenciosos de digitação. Como fazemos esse erro aparecer cedo? Neste repositório, um script verifica RouteRules, Steps e FlowCallouts. É uma validação útil, mas deliberadamente menor que a validação completa da plataforma.
 
-**Demonstração:** Use o XML já projetado: o nome referenciado em RouteRule deve corresponder ao TargetEndpoint. A comparação completa fica disponível no link.
+**Demonstração:** Explique que o build extrai o trecho diretamente do XML. No código projetado, mostre que o nome da RouteRule deve corresponder ao TargetEndpoint. A comparação completa fica disponível no link. [pausa breve]
 
 **Arquivos demonstrados:** `examples/01-basic/apiproxy/proxies/default.xml`, `examples/01-basic/apiproxy/targets/default.xml` e `scripts/validate_bundles.py`.
 
-**Transição:** Depois de saber como os arquivos se ligam, precisamos entender quando cada trecho executa.
+**Transição:** Já sabemos onde a configuração está e como as referências se ligam. Falta a pergunta que mais afeta o comportamento: em que momento cada trecho executa?
 
 ---
 
@@ -268,11 +268,11 @@ Notas:
 Notas:
 **Mensagem principal:** A resposta percorre os endpoints em ordem inversa, mas a execução interna continua PreFlow, primeiro Conditional Flow compatível e PostFlow.
 
-**Abertura:** Na volta do backend, a ordem PreFlow, Conditional Flow e PostFlow também se inverte? Pensem por alguns segundos antes de seguir as setas.
+**Abertura:** Na volta do backend, a ordem PreFlow, Conditional Flow e PostFlow também se inverte? Pensem por alguns segundos. Depois vamos ler o diagrama em duas camadas: entre os endpoints e dentro de cada endpoint.
 
-**Explicação principal:** No request, o ProxyEndpoint executa antes do TargetEndpoint. No response, a ordem entre eles se inverte. Dentro de cada pipeline, em qualquer sentido, a sequência continua PreFlow, primeiro Conditional Flow compatível e PostFlow. Cada flow executa seus Steps na ordem declarada.
+**Explicação principal:** No request, passamos primeiro pelo ProxyEndpoint e depois pelo TargetEndpoint. Na response, o caminho entre eles se inverte. Agora vem o detalhe que merece ênfase: dentro de cada pipeline, a ordem continua sendo PreFlow, primeiro Conditional Flow compatível e PostFlow. Não invertemos essa sequência interna só porque a mensagem está voltando. E, dentro de um flow, os Steps executam na ordem declarada.
 
-**Contexto arquitetural:** A posição determina quais variáveis estão disponíveis. Não devemos inverter a ordem interna na resposta; e uma falha que interrompe a execução normal segue para tratamento de erros, não para os próximos Steps.
+**Contexto arquitetural:** A posição de uma policy muda o contexto disponível e, portanto, pode mudar o resultado. Também há uma saída lateral importante: quando uma falha interrompe o fluxo normal, a execução segue para o tratamento de erros. Ela não continua inocentemente pelos próximos Steps.
 
 **Demonstração:** Resposta: não. Só a ordem entre endpoints se inverte. Use o diagrama e destaque a primeira condição compatível; o exemplo list-orders acrescenta contexto técnico apenas ao GET /.
 
@@ -312,9 +312,9 @@ Notas:
 
 **Abertura:** Uma chave inválida chega ao SpikeArrest neste pipeline? E duas chaves da mesma aplicação compartilham a mesma quota? Façam uma previsão antes de olharmos o XML.
 
-**Explicação principal:** `VerifyAPIKey` valida `x-api-key` e disponibiliza variáveis da chave. Removemos o header antes do roteamento. Depois, `SpikeArrest` limita rajadas do proxy a `10ps` em janela deslizante regional; `Quota` permite 100 chamadas por minuto para cada consumer key, em janela móvel. Por último, adicionamos correlação.
+**Explicação principal:** A sequência começa com `VerifyAPIKey`, que valida `x-api-key` e disponibiliza as variáveis associadas à credencial. Em seguida, removemos esse header para não repassá-lo ao backend. O `SpikeArrest` controla rajadas do proxy a `10ps`, usando contagem efetiva e janela deslizante regional. A `Quota` controla outra dimensão: até 100 chamadas por minuto para cada consumer key, em janela móvel. Por fim, adicionamos correlação.
 
-**Contexto arquitetural:** Aqui, `client_id` contém a própria chave, não o identificador lógico da aplicação: duas chaves têm contadores distintos. Como a verificação vem antes do SpikeArrest, chaves inválidas falham antes de alcançar essa policy. Portanto, ela não limita essas tentativas neste desenho. Proteger a borda antes da verificação exigiria outro controle. Os números são didáticos.
+**Contexto arquitetural:** Há um trade-off visível na ordem. Como a verificação vem antes do `SpikeArrest`, uma chave inválida falha antes de chegar a esse controle. Portanto, ele não limita essas tentativas neste desenho. Antecipar a proteção exigiria outro arranjo e mudaria o que conseguimos usar como identificador. Aqui, `client_id` contém a própria consumer key, não o identificador lógico da aplicação; duas chaves mantêm contadores distintos. As taxas são didáticas, não recomendações de capacidade.
 
 **Demonstração:** A resposta é não nos dois casos. Mostre o PreFlow e o Identifier da Quota. Compare a ordem atual com um controle de borda anterior à autenticação, sem propor uma ordem universal: proteger capacidade cedo e contabilizar somente credenciais válidas são objetivos distintos. Uma rotação de chave cria outro contador neste exemplo. Reserve uma pausa curta para a audiência justificar a escolha.
 
@@ -350,17 +350,17 @@ Notas:
 Notas:
 **Mensagem principal:** Uma KVM pode externalizar configuração; RouteRules ordenadas selecionam TargetEndpoints sem alterar o contrato público.
 
-**Abertura:** Se a configuração da KVM contiver um valor inesperado, queremos encaminhar ao backend padrão ou sinalizar uma falha? Neste cenário, a extensão orders-routing demonstra a segunda escolha; é um bundle independente.
+**Abertura:** Se a KVM contiver um valor inesperado, queremos encaminhar ao backend padrão ou sinalizar uma falha? A extensão independente `orders-routing` demonstra a segunda escolha, mantendo o mesmo contrato público.
 
-**Explicação principal:** `get-backend-region` lê a chave não sensível `backend-region` da KVM de environment `orders-routing-config` para `private.lab.backend.region`. A leitura continua somente até uma RaiseFault controlada quando a KVM/entrada falha, está ausente ou contém valor diferente de `primary` e `secondary`. Só então AssignMessage adiciona o contexto técnico. A RouteRule condicional para `secondary` vem primeiro; a regra sem condição para `primary` é o fallback final.
+**Explicação principal:** `get-backend-region` lê a chave não sensível `backend-region` da KVM de environment `orders-routing-config` e coloca o valor em `private.lab.backend.region`. Antes de rotear, validamos a configuração. Se a leitura falhar, a entrada estiver ausente ou o valor não for `primary` nem `secondary`, uma RaiseFault encerra o caminho normal de forma controlada. Só depois dessa validação o AssignMessage adiciona contexto técnico. A RouteRule condicional de `secondary` vem primeiro; a regra sem condição para `primary` fecha a lista como fallback.
 
-**Contexto arquitetural:** RouteRules são avaliadas de cima para baixo e a primeira compatível vence. A validação anterior impede que uma configuração inválida caia silenciosamente no fallback. A KVM e a entrada não são criadas pelo bundle; sem uma organização e um environment provisionados, este repositório só valida a estrutura. No Apigee atual, KVMs são criptografadas, e `private.` impede exposição do valor em Debug. KVM não é obrigatória nem substitui um cofre de segredos.
+**Contexto arquitetural:** RouteRules são avaliadas de cima para baixo, e a primeira compatível vence. Sem a validação anterior, um valor incorreto poderia cair silenciosamente no fallback. A KVM e sua entrada não nascem com o bundle; são dependências do environment. No Apigee atual, as entradas de KVM são criptografadas, e o prefixo `private.` evita que o valor apareça em claro nas sessões de Debug. Ainda assim, uma KVM não é obrigatória para esse desenho nem substitui automaticamente um cofre de segredos.
 
 **Demonstração:** Peça que prevejam o resultado de primary, secondary e um valor inválido. Mostre as RouteRules: secondary escolhe o destino alternativo, primary usa o fallback e valor inválido interrompe antes do roteamento. Discuta quem governa alterações da KVM e por que fallback não deve mascarar configuração incorreta.
 
 **Arquivos demonstrados:** `examples/02-intermediate/orders-routing/apiproxy/` e `examples/02-intermediate/README.md`.
 
-**Transição:** Com configuração e roteamento explícitos, avançamos para identidade assinada, reuso e tratamento de falhas.
+**Transição:** Escolher o destino resolve uma parte da integração. No módulo avançado, a pergunta muda: em quem confiamos, que informação encaminhamos e como falhamos quando algo dá errado?
 
 ---
 
@@ -387,7 +387,7 @@ Notas:
 
 **Abertura:** Se o gateway valida o token e envia somente o subject, o que impede uma chamada direta ao backend de forjar esse header? Esse é o problema de confiança que precisamos resolver além da policy.
 
-**Explicação principal:** `VerifyJWT` verifica RS256, issuer, audience e os claims exigidos usando o JWKS em `private.orders.jwks`. Depois retiramos `Authorization`. O `FlowCallout` invoca `orders-security-shared`, que propaga apenas o subject validado.
+**Explicação principal:** `VerifyJWT` valida RS256, issuer, audience e os claims exigidos usando o JWKS em `private.orders.jwks`. Depois da validação, retiramos `Authorization`. Por quê? Porque o backend deste exemplo não precisa receber o bearer token inteiro. O `FlowCallout` invoca `orders-security-shared`, e o Shared Flow propaga apenas o subject já validado. Isso reduz a informação encaminhada e deixa explícito quem é responsável por confiar no token.
 
 **Contexto arquitetural:** Validar assinatura, issuer e audience não substitui autorização por operação ou recurso. O Shared Flow usa Set em AssignMessage para substituir qualquer valor recebido em `x-authenticated-subject` pelo subject validado no caminho normal após VerifyJWT. Isso não impede acesso direto ao backend: restrições de acesso e autenticação entre serviços adequadas ao threat model são necessárias para confiar na origem e integridade do contexto, mas não estão implementadas no laboratório. Shared Flow reduz duplicação, mas amplia o raio de impacto de uma mudança e exige gestão de compatibilidade e implantação prévia no mesmo environment. JWT.failed agrupa falhas do token e falhas operacionais de chave/configuração em 401 no exemplo; produção deve distingui-las e monitorá-las. Outras falhas locais usam 500; falhas de conexão sem resposta HTTP usam 502; respostas HTTP 4xx/5xx preservam status e recebem corpo sanitizado. Nenhum desses controles adicionais de produção é implantado pelo laboratório.
 
@@ -395,7 +395,7 @@ Notas:
 
 **Arquivos demonstrados:** `examples/03-advanced/orders-advanced/apiproxy/proxies/default.xml`, `verify-jwt.xml`, `targets/default.xml` e `examples/03-advanced/orders-security-shared/sharedflowbundle/`.
 
-**Transição:** Esses artefatos precisam chegar aos environments com dependências e versões controladas.
+**Transição:** O desenho pode estar correto no repositório e ainda falhar na entrega. Shared Flow, KVM, proxy e environment precisam chegar ao lugar certo, na ordem certa.
 
 ---
 
@@ -420,15 +420,15 @@ Notas:
 
 **Abertura:** Uma alteração de Shared Flow pode afetar vários proxies. Como promover revisões e testar dependências sem transformar o deploy em tentativa e erro?
 
-**Explicação principal:** Um pipeline gera um ZIP determinístico, registra hash e versão, usa o recurso oficial `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. Depois, aguarda com timeout até o status da revisão ficar `READY` antes dos testes. Módulos reutilizáveis podem reduzir repetição, desde que entradas e dependências permaneçam explícitas.
+**Explicação principal:** O pipeline parte de um bundle que já pode ser revisado e validado. Ele gera um ZIP determinístico, registra hash e versão, usa `google_apigee_api` para importar a configuração e `google_apigee_api_deployment` para associar a revisão a um environment. A implantação não termina no momento em que o recurso é criado. Precisamos aguardar, com timeout, a revisão chegar a `READY` antes dos testes. Módulos reutilizáveis podem reduzir repetição, desde que não escondam entradas e dependências importantes.
 
-**Contexto arquitetural:** Shared Flow, KVM e environment podem criar ordem de implantação. Como o deployment é eventualmente consistente, o readiness check consulta a revisão específica, avança em `READY`, falha em `ERROR` e termina ao atingir o limite; só então começam Debug e testes de runtime num environment não produtivo. Estado remoto exige criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. O laboratório não inclui interfaces privadas, credenciais, backend de estado ou código Terraform executável.
+**Contexto arquitetural:** Shared Flow, KVM e environment criam relações de ordem. Como o deployment é eventualmente consistente, o readiness check consulta a revisão específica, avança em `READY`, falha em `ERROR` e encerra ao atingir o limite. Só depois entram Debug e testes de runtime em ambiente não produtivo. O estado remoto também é parte da arquitetura: requer criptografia, mínimo privilégio, locking, recuperação e cuidado com outputs. Este laboratório descreve o ciclo, mas não inclui credenciais, interfaces privadas, backend de estado ou Terraform executável.
 
 **Demonstração:** Use o diagrama para destacar revisão, dependências, readiness e testes; não abra HCL. O laboratório não cria recursos nem executa Terraform.
 
 **Arquivos demonstrados:** `docs/pt-br/deployment-lifecycle.md` e `docs/en/deployment-lifecycle.md`.
 
-**Transição:** Agora podemos condensar essas decisões em guardrails de revisão.
+**Transição:** Depois de percorrer runtime e entrega, podemos condensar o raciocínio em perguntas úteis para uma revisão arquitetural.
 
 ---
 
@@ -452,15 +452,15 @@ Notas:
 
 **Abertura:** Transformem os quatro critérios em perguntas de revisão de PR: onde a falha interrompe o fluxo, quem possui o contrato, quem depende do reuso e qual evidência o teste fornece?
 
-**Explicação principal:** Policies de segurança devem interromper a execução normal ao falhar. Interface pública e conexão com o target têm responsabilidades diferentes. Shared Flow reduz duplicação, mas cria dependência de implantação. E os testes precisam declarar claramente o que conseguem validar.
+**Explicação principal:** Primeiro: uma policy de segurança interrompe o caminho normal quando falha? Segundo: o contrato público está separado da conexão com o target? Terceiro: o reuso em Shared Flow compensa a nova dependência de implantação? E quarto: os testes deixam claro o que realmente verificam? Essas perguntas tornam as decisões discutíveis e revisáveis.
 
-**Contexto arquitetural:** Esses critérios ajudam a revisar decisões, não substituem threat modeling, capacidade, observabilidade ou uma estratégia de recuperação.
+**Contexto arquitetural:** Guardrails são limites para a conversa, não respostas universais. Eles não substituem threat modeling, planejamento de capacidade, observabilidade nem estratégia de recuperação. O contexto ainda decide o desenho final.
 
-**Demonstração:** Relacione os critérios com `docs/pt-br/architectural-decisions.md` e os limites com `docs/pt-br/validation.md`.
+**Demonstração:** Relacione cada critério a uma decisão já vista. Use `docs/pt-br/architectural-decisions.md` para aprofundar escolhas e `docs/pt-br/validation.md` para mostrar os limites da validação local.
 
 **Arquivos demonstrados:** `docs/pt-br/architectural-decisions.md` e `docs/pt-br/validation.md`.
 
-**Transição:** Vamos encerrar com uma trilha curta pelos três módulos.
+**Transição:** Esses critérios ficam mais concretos quando observamos a evolução completa, do proxy mínimo ao tratamento explícito de falhas.
 
 ---
 
@@ -491,17 +491,17 @@ python scripts/validate_bundles.py
 Notas:
 **Mensagem principal:** O roteiro offline relaciona requisições HTTP, policies e resultados condicionais sem simular o Apigee.
 
-**Abertura:** Vamos consolidar com três previsões: qual destino é selecionado, qual controle não é alcançado e qual categoria de falha deve ser tratada.
+**Abertura:** Vamos fazer o caminho inverso da teoria e consolidar com três previsões: qual destino é selecionado, qual controle não é alcançado e qual categoria de falha deve ser tratada.
 
-**Explicação principal:** No básico, o BasePath e a RouteRule mostram o caminho até um backend fictício. No intermediário, a chave inválida gera uma falha padrão da VerifyAPIKey; com chave válida, SpikeArrest e Quota passam a controlar o tráfego. No avançado, a FaultRule configura JWT.failed como 401 e a falha de conexão ao target como 502. O demonstrador offline lê essas configurações, sem emitir requisições HTTP.
+**Explicação principal:** No básico, procuramos o `BasePath` e a RouteRule que levam ao backend fictício. No intermediário, uma chave inválida provoca a falha padrão de `VerifyAPIKey`; com uma chave válida, `SpikeArrest` e `Quota` passam a participar do caminho e podem produzir 429. No avançado, a FaultRule transforma `JWT.failed` em 401, enquanto uma falha de conexão com o target resulta em 502. O demonstrador offline apenas lê essas configurações. Ele não envia requisições HTTP.
 
-**Contexto arquitetural:** Os resultados dependem do runtime e de recursos externos. Não mostramos HTTP 200 porque o backend é fictício. O código offline não é um emulador Apigee; o validador confirma apenas XML e referências locais.
+**Contexto arquitetural:** Aqui é importante separar evidência de expectativa. Os XMLs permitem explicar o resultado configurado, mas o comportamento observado depende do runtime e de recursos externos. Não mostramos HTTP 200 porque o backend é fictício. O demonstrador não emula o Apigee, e o validador confirma somente XML e referências locais.
 
 **Demonstração:** Deixe abertos docs/pt-br/http-scenarios.md e os ProxyEndpoints. Use 30 segundos para BasePath e RouteRule; 75 segundos para a chave inválida, quota por chave e 429 condicionais; 90 segundos para JWT.failed → 401, target sem resposta → 502 e backend 404 sanitizado. Use os 45 segundos finais para os dois comandos. Peça previsões antes de revelar o comportamento configurado. Se o terminal atrasar, use o guia de cenários já aberto. Não execute curl para .invalid.
 
 **Arquivos demonstrados:** `docs/pt-br/http-scenarios.md`, `scripts/demo_http_scenarios.py`, `scripts/validate_bundles.py`, `examples/01-basic/`, `examples/02-intermediate/` e `examples/03-advanced/`.
 
-**Transição:** Agora podemos resumir o que aprendemos.
+**Transição:** Depois de seguir a mesma ideia do contrato até a falha, podemos voltar à pergunta da abertura: onde a intenção arquitetural aparece de verdade?
 
 ---
 
@@ -527,15 +527,15 @@ Notas:
 Notas:
 **Mensagem principal:** Apigee torna a fronteira programável; qualidade vem da intenção explícita, das dependências visíveis e da validação proporcional ao risco.
 
-**Abertura:** Para concluir, pensem em um proxy que vocês mantêm hoje: qual decisão de pipeline, segurança ou tratamento de falha merece ser revisitada?
+**Abertura:** No começo, eu perguntei onde enxergamos a intenção de uma API bem gerenciada. Para concluir, pensem em um proxy que vocês mantêm hoje: qual decisão de pipeline, segurança ou tratamento de falha merece ser revisitada?
 
-**Explicação principal:** Retomem os três objetivos: explicar a ordem dos flows; justificar a posição e o escopo dos controles; identificar riscos de confiança, reuso e falhas. Cada um deve conseguir apontar uma decisão concreta no próprio contexto. Os exemplos são configuração declarativa e evidência estática, não garantia de comportamento produtivo.
+**Explicação principal:** Vimos essa intenção na ordem dos flows, na posição e no escopo dos controles e nos riscos de confiança, reuso e falhas. Tornar essas escolhas explícitas permite revisá-las e discordar delas com evidência. Cada pessoa deve conseguir apontar uma decisão concreta no próprio contexto. Os exemplos são configuração declarativa e evidência estática, não garantia de comportamento produtivo.
 
-**Contexto arquitetural:** Em uma implantação real, o próximo passo seria testar sucessos e falhas num ambiente de teste, medir limites e definir operação de chaves, logs e rollout.
+**Contexto arquitetural:** Em uma implantação real, o próximo passo seria levar as hipóteses para um ambiente de teste: exercitar sucesso e falha, medir limites e definir operação de chaves, logs e rollout. Talvez essa seja a reflexão mais útil para levar daqui: uma boa arquitetura não é a que esconde a complexidade, mas a que torna suas decisões e limites compreensíveis para quem precisa operá-la. [pausa]
 
 **Arquivos demonstrados:** `README.md`, `docs/pt-br/` e `examples/`.
 
-**Transição:** Obrigado! Vamos às perguntas.
+**Transição:** Obrigado por acompanharem esse percurso. Agora quero ouvir as perguntas e os cenários de vocês.
 
 ---
 
@@ -551,12 +551,12 @@ Notas:
 Notas:
 **Mensagem principal:** O tempo de perguntas começa agora e não faz parte dos 28 minutos de exposição.
 
-**Abertura:** Obrigado por acompanharem até aqui. Agora eu quero ouvir as perguntas e também os cenários que vocês encontram no dia a dia.
+**Abertura:** Obrigado! Agora quero ouvir as perguntas e, se fizer sentido, os cenários que vocês encontram no dia a dia.
 
-**Explicação principal:** Se for útil para começar, dúvidas frequentes são: quando usar API key ou JWT; onde posicionar uma policy; como versionar Shared Flows; qual a diferença prática entre SpikeArrest e Quota; e o que ainda precisa ser validado dentro do Apigee.
+**Explicação principal:** Se precisarmos de um ponto de partida, algumas perguntas costumam abrir boas discussões: quando usar API key ou JWT? Onde posicionar uma policy? Como versionar Shared Flows? Qual é a diferença prática entre `SpikeArrest` e `Quota`? E o que só pode ser validado dentro do Apigee?
 
-**Contexto arquitetural:** Ao responder, eu separo o que o exemplo comprova do que depende de topologia, licenciamento, volume, threat model ou processos da organização. Se uma resposta exigir mais contexto, prefiro explicitar a hipótese em vez de transformar o laboratório em receita universal.
+**Contexto arquitetural:** Ao responder, separe o que o laboratório comprova daquilo que depende de topologia, licenciamento, volume, threat model ou processos da organização. Quando faltar contexto, explicite a hipótese. Isso preserva a precisão sem transformar o exemplo em receita universal.
 
 **Arquivos demonstrados:** `README.md` e o repositório público indicado na tela.
 
-**Transição:** Encerrar agradecendo e convidando o público a continuar a discussão pelo repositório.
+**Transição:** Ao encerrar, agradeça e indique o repositório para quem quiser reproduzir o percurso ou continuar a discussão.

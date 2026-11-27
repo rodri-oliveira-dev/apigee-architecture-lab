@@ -34,8 +34,14 @@ Opening and fundamentals (slides 1–8): 7 min; intermediate (9–10): 7 min; ad
 12. Terraform deployment lifecycle
 13. Architecture guardrails
 14. Repository demonstration
-15. Conclusions
+15. A well-managed API makes decisions explicit
 16. Questions
+
+## Narrative arc
+
+The presentation follows a fictitious orders API and uses one question as its narrative thread: where does the intent of a well-managed API become visible? It starts with growing complexity, separates gateway execution from API Management, opens the bundle, and follows execution through security, routing, faults, and deployment. The demonstration reconstructs that path from hypothetical requests. The conclusion returns to the opening question and proposes that visible decisions and limits make architecture reviewable and operable.
+
+The notes support a conversation rather than a verbatim reading. **Opening** and **Main explanation** carry the essential talk. **Architectural context** provides optional depth and trade-offs. **Demonstration** contains stage and navigation guidance, not narration to be recited.
 
 ## Technical points to preserve
 

@@ -36,8 +36,14 @@ Abertura e revisão (slides 1–8): 7 min; intermediário (9–10): 7 min; avan�
 | 12 | Terraform no ciclo de implantação | 2 min |
 | 13 | Guardrails arquiteturais | 1 min 30 s |
 | 14 | Demonstração: siga a evolução | 4 min |
-| 15 | Conclusão | 2 min |
+| 15 | Uma API bem gerenciada torna decisões explícitas. | 2 min |
 | 16 | Perguntas? | fora da exposição |
+
+## Arco narrativo
+
+A apresentação acompanha uma API fictícia de pedidos e usa uma pergunta como fio condutor: onde a intenção de uma API bem gerenciada aparece de verdade? O percurso parte do crescimento da complexidade, separa gateway de API Management, abre o bundle e segue a execução até segurança, roteamento, falhas e implantação. A demonstração recompõe esse caminho a partir de requisições hipotéticas. O encerramento retorna à pergunta inicial e propõe que decisões e limites visíveis tornam a arquitetura revisável e operável.
+
+As notas são apoio para uma conversa, não texto para leitura integral. **Abertura** e **Explicação principal** sustentam a fala. **Contexto arquitetural** oferece aprofundamento seletivo e trade-offs. **Demonstração** contém orientação de palco e navegação, não uma locução a ser recitada.
 
 ## Pontos técnicos que não podem ser abreviados
 
@@ -60,13 +66,14 @@ Abertura e revisão (slides 1–8): 7 min; intermediário (9–10): 7 min; avan�
 Os tempos indicam uma **janela para explicação, demonstração e transição**, não uma meta de palavras. Nas notas, **Abertura** e **Explicação principal** formam a fala essencial. **Contexto arquitetural** é material de aprofundamento seletivo; **Demonstração** orienta a navegação e não precisa ser lida integralmente.
 
 - Slides 1–8: recapitulação de sete minutos, usando o material projetado sem abrir cada arquivo. Slide 2: apresentação pessoal breve em 45 segundos.
+- Slide 3: deixe a pergunta sobre as garantias da chamada estabelecer o problema; não antecipe a solução.
 - Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
 - Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
 - Slide 10: seguir KVM → validação → AssignMessage → RouteRules e enfatizar que a plataforma não é executada localmente.
 - Slide 11: aprofundar a fronteira de confiança após remoção do bearer, autorização versus autenticação, compatibilidade de Shared Flows e categorias de falhas. Explicar que AssignMessage/Set sobrescreve o header de subject com o valor validado, mas não protege contra acesso direto ao backend; restrições de acesso e autenticação entre serviços estão fora do laboratório.
 - Slide 12: manter Terraform conceitual; não abrir um treinamento de HCL.
 - Slide 14: 30 s básico, 75 s intermediário, 90 s avançado e 45 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado. As perguntas de previsão são pausas curtas incluídas nos tempos; discussões abertas ficam para o final. Se o terminal atrasar, use o guia aberto.
-- Slide 15: peça que cada participante identifique uma decisão aplicável a um proxy que mantém; retome os objetivos de aprendizagem.
+- Slide 15: recupere a pergunta da abertura, peça que cada participante identifique uma decisão aplicável a um proxy que mantém e retome os objetivos de aprendizagem.
 
 ## Ensaio e Speaker View
 
