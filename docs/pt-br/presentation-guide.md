@@ -30,8 +30,14 @@ Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e
 | 12 | Terraform no ciclo de implantação | 2 min 20 s |
 | 13 | Guardrails arquiteturais | 1 min 30 s |
 | 14 | Demonstração: siga a evolução | 2 min 30 s |
-| 15 | Conclusão | 1 min 15 s |
+| 15 | Uma API bem gerenciada torna decisões explícitas. | 1 min 15 s |
 | 16 | Perguntas? | fora da exposição |
+
+## Arco narrativo
+
+A apresentação acompanha uma API fictícia de pedidos e usa uma pergunta como fio condutor: onde a intenção de uma API bem gerenciada aparece de verdade? O percurso parte do crescimento da complexidade, separa gateway de API Management, abre o bundle e segue a execução até segurança, roteamento, falhas e implantação. A demonstração recompõe esse caminho a partir de requisições hipotéticas. O encerramento retorna à pergunta inicial e propõe que decisões e limites visíveis tornam a arquitetura revisável e operável.
+
+As notas são apoio para uma conversa, não texto para leitura integral. **Abertura** e **Explicação principal** sustentam a fala. **Contexto arquitetural** oferece aprofundamento seletivo e trade-offs. **Demonstração** contém orientação de palco e navegação, não uma locução a ser recitada.
 
 ## Pontos técnicos que não podem ser abreviados
 
@@ -54,12 +60,14 @@ Não edite o roteiro gerado manualmente. `npm run build --prefix presentation` e
 Os tempos indicam uma **janela para explicação, demonstração e transição**, não uma meta de palavras. Nas notas, **Abertura** e **Explicação principal** formam a fala essencial. **Contexto arquitetural** é material de aprofundamento seletivo; **Demonstração** orienta a navegação e não precisa ser lida integralmente.
 
 - Slide 2: apresentação pessoal breve, em 45 segundos, sem ler toda a biografia.
+- Slide 3: deixe a pergunta sobre as garantias da chamada estabelecer o problema; não antecipe a solução.
 - Slide 8: começar pela ordem entre endpoints; depois explicar PreFlow, Conditional Flow e PostFlow.
 - Slide 9: distinguir rajadas de consumo e explicar a consequência da verificação da chave antes do SpikeArrest.
 - Slide 10: seguir KVM → validação → AssignMessage → RouteRules e enfatizar que a plataforma não é executada localmente.
 - Slide 11: priorizar a cadeia JWT → remoção do bearer → FlowCallout; falhas detalhadas ficam nas notas.
 - Slide 12: manter Terraform conceitual; não abrir um treinamento de HCL.
 - Slide 14: aproximadamente 30 s básico, 45 s intermediário, 40 s avançado e 35 s de demonstração offline e validação. O [guia HTTP](http-scenarios.md) separa status configurado de resultado observado.
+- Slide 15: recupere a pergunta da abertura, faça uma pausa antes da reflexão final e evite transformar a conclusão em uma nova lista técnica.
 
 ## Ensaio e Speaker View
 
