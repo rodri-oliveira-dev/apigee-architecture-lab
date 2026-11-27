@@ -1,6 +1,6 @@
 # Apresentação técnica — Google Cloud Apigee
 
-Apresentação em português brasileiro, com 16 slides e 28 minutos de exposição, seguidos por perguntas. O slide 14 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
+Apresentação em português brasileiro, com 16 slides e 28 minutos de exposição, seguidos por perguntas, voltada a profissionais que já trabalham com Apigee. A revisão de fundamentos ocupa sete minutos; o restante aprofunda decisões, trade-offs e cenários. O slide 14 utiliza [cenários HTTP hipotéticos](../docs/pt-br/http-scenarios.md) e um demonstrador offline que lê os XMLs sem enviar requisições. Usa o Reveal.js oficial e os plugins nativos Markdown, Highlight e Notes. Trechos XML e diagramas são gerados a partir dos exemplos e da documentação do repositório.
 
 ## Pré-requisitos
 
@@ -95,3 +95,7 @@ A configuração de execução **Presentation: Open in Browser** inicia a task d
 - `scripts/validate.mjs`: verificação da distribuição estática;
 - `scripts/visual-check.mjs`: inspeção automatizada no Chromium em quatro resoluções, com relatório e capturas;
 - `scripts/serve.mjs`: servidor HTTP local sem dependência adicional.
+
+## Revisão pedagógica
+
+Use a [skill de revisão pedagógica](../.github/skills/pedagogical-review/SKILL.md) ao alterar conteúdo, exemplos ou notas. Preserve o público experiente, a progressão e o tempo de exposição.

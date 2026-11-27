@@ -68,11 +68,11 @@ A KVM e a entrada **não são criadas pelo bundle nem por este repositório**. E
 
 ## English
 
-**Problem:** block anonymous access, control bursts, cap per-application consumption, and propagate correlation. A Conditional Flow for `GET /` acts as a structural marker: its `Request` and `Response` blocks are empty, so it executes no business behavior. It only shows where operation-specific Steps could be attached.
+**Problem:** block anonymous access, control bursts, cap consumption per consumer key, and propagate only necessary context. The Conditional Flow for `GET /` executes one AssignMessage adding `x-api-operation: list-orders`; it does not execute business logic.
 
-The ProxyEndpoint executes `VerifyAPIKey → SpikeArrest → Quota → AssignMessage`; its XML also declares the conditional flow and routing. Individual files under `policies/` keep each concern explicit, while the TargetEndpoint remains fictitious.
+The ProxyEndpoint executes `VerifyAPIKey → remove x-api-key → SpikeArrest → Quota → AssignMessage`; its XML also declares the conditional flow and routing. Individual files under `policies/` keep each concern explicit, while the TargetEndpoint remains fictitious.
 
-The bundle is statically checkable, but runtime API-key verification requires an API product, developer app, and issued key. Quota consumes the verified `client_id`. With `UseEffectiveCount=true`, SpikeArrest uses a regional sliding window for the whole proxy because no client identifier is configured; Quota governs each application's rolling-window consumption. Synchronous distributed quota counting favors strictness but may reduce throughput. Authenticate before per-consumer accounting, size limits from evidence, and do not treat `messageid` as a business identifier.
+The bundle is statically checkable, but runtime API-key verification requires an API product, developer app, and issued key. Quota consumes the verified `client_id`. With `UseEffectiveCount=true`, SpikeArrest uses a regional sliding window for the whole proxy because no client identifier is configured; Quota governs each consumer key's rolling-window consumption; two keys belonging to the same application have separate counters, and rotating the key creates a new counter. Invalid keys fail before reaching SpikeArrest in this pipeline. Synchronous distributed quota counting favors strictness but may reduce throughput. Authenticate before per-consumer accounting, size limits from evidence, and do not treat `messageid` as a business identifier.
 
 The independent `orders-routing` extension reads the non-sensitive `backend-region` entry from an environment-scoped KVM, validates it, enriches the request with `AssignMessage`, and routes to either the `primary` or `secondary` named TargetEndpoint. The conditional route is declared first and the validated primary fallback last. The KVM must be provisioned in an Apigee environment; this repository performs no KVM operation or deployment.
 

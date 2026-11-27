@@ -26,7 +26,7 @@ No proxy, o `ProxyEndpoint` define a interface voltada ao consumidor e os fluxos
 | [02 — Intermediário](examples/02-intermediate/README.md) | API key, tráfego, KVM e múltiplos TargetEndpoints | Exige produto/app/chave e KVM no Apigee |
 | [03 — Avançado](examples/03-advanced/README.md) | JWT, Shared Flow e falhas de proxy, target e backend | Exige JWKS em variável privada e deploy ordenado |
 
-Siga a ordem numérica. Compare o `PreFlow` dos módulos para perceber como a cadeia de políticas cresce e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 30 minutos.
+Siga a ordem numérica: recapitule fundamentos, aprofunde decisões intermediárias e questione trade-offs avançados. Os bundles são independentes e não cumulativos. Compare seus `PreFlow` e use o [roteiro de apresentação](docs/pt-br/presentation-guide.md) para uma sessão de 28 minutos, seguida de perguntas, voltada a profissionais que já trabalham com Apigee.
 
 O bundle `orders-routing`, dentro do módulo intermediário, é uma extensão didática independente: recupera uma configuração não sensível de KVM, valida o valor, enriquece a mensagem e escolhe entre dois TargetEndpoints. A KVM não é criada nem acessada localmente. O [guia de ciclo de implantação](docs/pt-br/deployment-lifecycle.md) posiciona bundles versionados, módulos reutilizáveis, dependências e estado remoto numa estratégia Terraform sem apresentar interfaces privadas ou executar deploy.
 
